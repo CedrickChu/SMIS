@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="wrapper">
+    {% include '../sidebar.html' %}
+    <div class="main-panel">
+        {% include '../navbar.html' %}
+        <div class="content">
+            <div class="row">
+                <div class="col-md-8" id="s_page">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">List of School Year</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table id="school_year" class="table table-hover table-bordered">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th style="width:20%">School Year</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th style="width:10%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for year in school_years %}
+                                    <tr>
+                                        <td>
+                                            <input id="year-name-{{ year.id }}" type="text" style="border:0px" value="{{ year.year }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input id="year-start-date-{{ year.id }}" type="date" style="border:0px" value="{{ year.start_date|date:'Y-m-d' }}" readonly>
+                                        </td>
+                                        <td>
+                                            <input id="year-end-date-{{ year.id }}" type="date" style="border:0px" value="{{ year.end_date|date:'Y-m-d' }}" readonly>
+                                        </td>
+                                        <td>
+                                            <a href="#" onclick="editYear('{{ year.id }}')" class="btn btn-info">
+                                                <i class="fa fa-pen" aria-hidden="true"></i> Edit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="container frm-new">
+                        <div class="row main">
+                            <div class="main-login main-center">
+                                <h3 id="head">{{ form_title }}</h3>
+                                <form id="year-form" method="post" action="#">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="id" name="id">
+                                    <div class="form-group">
+                                        <label for="school_year" class="cols-sm-2 control-label">School Year</label>
+                                        <div class="cols-sm-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
+                                                <input type="text" class="form-control" id="year" name="year" style="width:200px" value="{{ school_year_form.year.value }}">
+                                            </div>
+                                            <p>
+                                                {% if school_year_form.year.errors %}
+                                                <div class='error' id='alert'><h5>{{ school_year_form.year.errors }}</h5></div>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="start_date" class="cols-sm-2 control-label">Start Date</label>
+                                        <div class="cols-sm-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                                                <input type="date" class="form-control" id="start_date" name="start_date" style="width:200px" value="{{ school_year_form.start_date.value }}">
+                                            </div>
+                                            <p>
+                                                {% if school_year_form.start_date.errors %}
+                                                <div class='error' id='alert'><h5>{{ school_year_form.start_date.errors }}</h5></div>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="end_date" class="cols-sm-2 control-label">End Date</label>
+                                        <div class="cols-sm-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                                                <input type="date" class="form-control" id="end_date" name="end_date" style="width:200px" value="{{ school_year_form.end_date.value }}">
+                                            </div>
+                                            <p>
+                                                {% if school_year_form.end_date.errors %}
+                                                <div class='error' id='alert'><h5>{{ school_year_form.end_date.errors }}</h5></div>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div id="status"></div>
+                                    <div class="form-group">
+                                        <input type="button" class="btn btn-info" id="reset" name="reset" value="Cancel" onclick="resetForm()">
+                                        <button type="submit" class="btn btn-info" id="btn_submit">{{ submit_label }}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function editYear(yearId) {
+        var yearName = document.getElementById('year-name-' + yearId).value;
+        var startDate = document.getElementById('year-start-date-' + yearId).value;
+        var endDate = document.getElementById('year-end-date-' + yearId).value;
+        document.getElementById('year-form').action = "{% url 'year-update' pk=0 %}".replace('0', yearId);
+        document.getElementById('id').value = yearId;
+        document.getElementById('year').value = yearName;
+        document.getElementById('start_date').value = startDate;
+        document.getElementById('end_date').value = endDate;
+        document.getElementById('head').innerText = 'Edit Year';
+        document.getElementById('btn_submit').innerText = 'Update Year';
+    }
+
+    function resetForm() {
+        document.getElementById('year-form').action = "#";
+        document.getElementById('id').value = '';
+        document.getElementById('year').value = '';
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+        document.getElementById('btn_submit').innerText = '{{ submit_label }}';
+        document.getElementById('head').innerText = '{{ form_title }}';
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('logout/', views.logout_view, name='logout'),
+    path('', views.login_view, name='login'),
+    path('home/', views.home, name='home'),
+    # path('accounts/confirm-email/<str:key>/', views.CustomConfirmEmailView.as_view(), name='account_confirm_email'),
+    # path('send-verification/', views.send_verification_email, name='send_verification_email'),  
+    # path('email_verification_required/', views.email_verification_required, name='email_verification_required'),
+    path('students/', views.student_list, name='student-list'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('student/edit/<int:student_id>/', views.student_update, name='student-update'),
+    path('student/add/', views.add_student, name='student-add'),
+    path('student/<int:pk>/delete/', views.StudentDeleteView.as_view(), name='student-delete'),
+    path('gradelevel/', views.grade_list, name='grade-level'),
+    path('gradelevel/add/', views.add_grade, name='grade-add'),
+    path('grades/<int:pk>/update/', views.update_grade, name='grade-update'),
+    path('subject/', views.subject_list, name='subject-list'),
+    path('subject/add/', views.add_subject, name='subject-add'),
+    path('subject/<int:pk>/update/', views.update_subject, name='subject-update'),
+    path('report/form137/', views.student_report, name='student_record'),
+    path('report/<int:pk>/form137/', views.student_form137, name='student-report-print'),
+    path('rms/', views.student_report_card, name='student-academic-record'),
+    path('rms/<int:id>/', views.student_record_view, name='student-report-card'),
+    path('schoolyear/', views.school_year, name='schoolyear-list'),
+    path('schoolyear/add/', views.add_year, name='year-add'),
+    path('schoolyear/<int:pk>/update/', views.update_year, name='year-update'),
+    path('section/', views.section_list, name='section-list'),
+    path('section/add/', views.add_section, name='section-add'),
+    path('section/<int:pk>/update/', views.update_section, name='section-update'),
+]

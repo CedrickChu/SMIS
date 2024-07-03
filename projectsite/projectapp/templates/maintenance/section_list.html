@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="wrapper">
+    {% include '../sidebar.html' %}
+    <div class="main-panel">
+        {% include '../navbar.html' %}
+        <div class="content">
+            <div class="row">
+                <div class="col-md-8" id="s_page">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">List of Section</h3>
+                        </div>
+                        <div class="container" style="padding-top:20px;">
+                            <form id="filter-form" method="GET" action="{% url 'subject-list' %}">
+                                <div class="input-group no-border" style="float:right; width:20%;">
+                                    <input type="text" style='height:40px;' name="search" value="{{ request.GET.search }}" class="form-control" placeholder="Search...">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="input-group-text"><i class="nc-icon nc-zoom-split"></i></button>
+                                    </div>
+                                </div>
+                                <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
+                                    <select name="grade_level" class="form-control" style="height:40px;">
+                                        {% for level in grade_levels %}
+                                        <option value="{{ level.id }}" {% if request.GET.grade_level == level.id|stringformat:'s' %} selected {% endif %}>{{ level.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div style="float: right; margin-right: 10px; margin-top:-10px;">
+                                    <button style='height:40px;' type="button" class="btn btn-primary" onclick="filterSubjects()">Filter</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="panel-body">
+                            <table id="subjects" class="table table-hover table-bordered">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th style="width:20%">Section</th>
+                                        <th style="width:10%">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for section in sections %}
+                                    <tr class="text-center">
+                             
+                                        <td><input id="section{{ section.id }}" type="text" style="border:0px" value="{{ section.name }}" readonly></td>
+                                        <td class="text-center">
+                                            <a href="#" onclick="editSection('{{ section.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
+                                        </td>
+                                       
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="container frm-new">
+                        <div class="row main">
+                            <div class="main-login main-center">
+                                <h3 id="head">{{ form_title }}</h3>
+                                <form id="section-form" method="post" action="{% url 'section-add' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="id" name="id">
+                                    <div class="form-group">
+                                        <label for="name" class="cols-sm-2 control-label">Section Name</label>
+                                        <div class="cols-sm-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                   <i><svg xmlns="http://www.w3.org/2000/svg" style='height:20px;'fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                                  </svg>
+                                                  </i>                                                   
+                                                </span>
+                                                <input type="text" class="form-control" id="name" name="name" style="width:200px" value="{{ section_form.section.value }}">
+                                            </div>
+                                            <p>
+                                                {% if section_form.section.errors %}
+                                                <div class='error' id='alert'><h5>{{ section_form.section.errors }}</h5></div>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="grade_level">Grade Level</label>
+                                        <select style='height:40px;'class="form-control" id="grade_level" name="grade_level">
+                                            {% for level in grade_levels %}
+                                                <option value="{{ level.id }}">{{ level.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div id="status"></div>
+                                    <div class="form-group">
+                                        <input type="button" class="btn btn-info" id="reset" name="reset" value="Cancel" onclick="resetForm()">
+                                        <button type="submit" class="btn btn-info" id="btn_submit">{{ submit_label }}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterSection() {
+        document.getElementById("filter-form").submit();
+    }
+
+    function editSection(sectionId) {
+        var sectionName = document.getElementById('section' + sectionId).value;
+        document.getElementById('section-form').action = "{% url 'section-update' pk=0 %}".replace('0', sectionId);
+        document.getElementById('id').value = sectionId;
+        document.getElementById('name').value = sectionName;
+        document.getElementById('head').innerText = 'Edit Section';
+        document.getElementById('btn_submit').innerText = 'Update Section';
+    }
+
+    function resetForm() {
+        document.getElementById('section-form').action = "{% url 'section-add' %}";
+        document.getElementById('id').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('grade_level').value = '';
+        document.getElementById('head').innerText = '{{ form_title }}';
+        document.getElementById('btn_submit').innerText = '{{ submit_label }}';
+    }
+
+</script>
+{% endblock %}

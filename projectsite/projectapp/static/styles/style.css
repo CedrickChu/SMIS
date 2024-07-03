@@ -1,0 +1,45 @@
+
+html{
+    scroll-behavior: smooth;
+}
+body {
+
+    padding: 0;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    color: #000;
+}
+body.light-mode{
+    --clr-light: #111827;
+    --clr-dark: #E5E7EB;
+    --clr-slate500: #1F2937;
+    --clr-slate700: #1F2937;
+    --clr-slate800: #1F2937;
+}
+body.light-mode-table{
+    background-color: white!important;
+}
+img,
+picture,
+canvas,
+svg{
+    display: block;
+    max-width: 100%;
+    user-select: none;
+}
+
+
+ul {
+    list-style-type: none;
+  }
+
+a {
+    color: var(--clr-red);
+}
+
+strong {
+    color: var(--clr-blue)
+}
+.input-group-addon{
+    width: 40px!important;
+}

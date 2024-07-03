@@ -1,0 +1,95 @@
+<!-- student_update.html -->
+{% extends 'base.html' %}
+{% block content %}
+<div class="wrapper">
+    {% include '../sidebar.html' %}
+    <div class="main-panel">
+        {% include '../navbar.html' %}
+        <div class="content">
+            <div class="container container-fluid mx-auto">
+                <h2>Edit Student</h2>
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col" >
+                            <div class="form-group" style="width:350px;">
+                                <label for="id_lrn">LRN:</label>
+                                {{ form.lrn }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="id_first_name">First Name:</label>
+                                {{ form.first_name }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="id_middle_name">Middle Name:</label>
+                                {{ form.middle_name }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="id_last_name">Last Name:</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group" style="width:350px;">
+                                <label for="id_birth_date">Birth Date:</label>
+                                {{ form.birth_date }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="id_birth_date">Place of Birth:</label>
+                                {{ form.place_of_birth }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="id_grade_level">Grade Level:</label>
+                                {{ form.grade_level }}
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="id_gender">Gender:</label>
+                                {{ form.gender }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="id_address">Address:</label>
+                                {{ form.address }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group" style="width: 550px;">
+                                <label for="id_parent_guardians">Parent/Guardians:</label>
+                                {{ form.parent_guardians }}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" style='margin-right:20px;' class="btn btn-danger">Save Changes</button>
+                    <a href="{% url 'student-list' %}" class="btn btn-secondary">Cancel</a>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
