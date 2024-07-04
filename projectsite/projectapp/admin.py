@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, UserProfile, SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, School, Form137, Adviser, StudentYearInfo, TotalGradeSubject, Section
+from .models import User, UserProfile, SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, School, Form137, Teacher, StudentYearInfo, TotalGradeSubject, Section
 from .widgets import PastCustomDatePickerWidget
 from django.db import models
 
@@ -70,10 +70,9 @@ class Form137Admin(admin.ModelAdmin):
     search_fields = ('student__first_name', 'student__last_name', 'school__name')
     raw_id_fields = ('student', 'school', 'records')
 
-@admin.register(Adviser)
-class AdviserAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'middle_name', 'last_name', 'grade_level', 'Section', 'school_year')
-    list_filter = ('grade_level', 'Section', 'school_year')
+@admin.register(Teacher)
+class TeacherAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'middle_name', 'last_name', 'contact_information')
     search_fields = ('first_name', 'middle_name', 'last_name')
     ordering = ('last_name', 'first_name')
 

@@ -31,6 +31,7 @@
                                 <thead>
                                     <tr class="text-center">
                                         <th style="width:20%">Section</th>
+                                        <th>Adviser</th>
                                         <th style="width:10%">Action</th>
                                     </tr>
                                 </thead>
@@ -38,8 +39,9 @@
                                     {% for section in sections %}
                                     <tr class="text-center">
                                         <td><input id="section{{ section.id }}" type="text" style="border:0px" value="{{ section.name }}" readonly></td>
+                                        <td><input id="sectionAdviser{{ section.id }}" type="text" style="border:0px" value="{{ section.adviser }}" readonly></td>
                                         <td class="text-center">
-                                            <a href="#" onclick="editSection('{{ section.id }}', '{{ section.grade_level.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
+                                            <a href="#" onclick="editSection('{{ section.id }}', '{{ section.grade_level.id }}', '{{ section.adviser.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -80,6 +82,14 @@
                                         <select style='height:40px;' class="form-control" id="grade_level" name="grade_level" required>
                                             {% for level in grade_levels %}
                                                 <option value="{{ level.id }}">{{ level.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="adviser">Adviser</label>
+                                        <select style='height:40px;' class="form-control" id="adviser" name="adviser" required>
+                                            {% for adviser in advisers %}
+                                                <option value="{{ adviser.id }}">{{ adviser.first_name }} {{ adviser.last_name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -124,11 +134,13 @@
         document.getElementById("filter-form").submit();
     }
 
-    function editSection(sectionId, gradeLevelId) {
+    function editSection(sectionId, gradeLevelId, adviserId) {
         var sectionName = document.getElementById('section' + sectionId).value;
         console.log(gradeLevelId);
+        console.log(adviserId);
         document.getElementById('section-form').action = "{% url 'section-update' pk=0 %}".replace('0', sectionId);
         document.getElementById('id').value = sectionId;
+        document.getElementById('adviser').value = adviserId;
         document.getElementById('grade_level').value = gradeLevelId; 
         document.getElementById('name').value = sectionName;
         document.getElementById('head').innerText = 'Edit Section';
@@ -139,6 +151,7 @@
         document.getElementById('section-form').action = "{% url 'section-add' %}";
         document.getElementById('id').value = '';
         document.getElementById('name').value = '';
+        document.getElementById('adviser').value = '';
         document.getElementById('grade_level').value = '';
         document.getElementById('head').innerText = '{{ form_title }}';
         document.getElementById('btn_submit').innerText = '{{ submit_label }}';

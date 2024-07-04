@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section
+from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher
 from django.urls import reverse_lazy
 from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm
 from django.db.models import Q 
@@ -368,6 +368,7 @@ def update_year(request, pk):
 def section_list(request):
     sections = Section.objects.all()
     grade_levels = GradeLevel.objects.all()
+    advisers = Teacher.objects.all()
     grade_level_filter = request.GET.get('grade_level')
     default_grade_level_id = 1  
     
@@ -380,6 +381,7 @@ def section_list(request):
     submit_label = 'Add Section'  
     return render(request, 'maintenance/section_list.html', {
         'sections': sections,
+        'advisers': advisers,
         'section_form': section_form,
         'submit_label': submit_label,
         'form_title': 'Add Section',
@@ -419,3 +421,27 @@ def update_section(request, pk):
         'submit_label': submit_label,
         'form_title': 'Edit Section'  
     })
+
+
+def adviser_list(request):
+    teacher = Teacher.objects.all()
+    grade_levels = GradeLevel.objects.all()
+    section = Section.objects.all()
+    grade_level_filter = request.GET.get('grade_level')
+    search_query = request.GET.get('search')
+
+    if grade_level_filter:
+        teacher = teacher.filter(grade_level_id=grade_level_filter)
+        
+
+    if search_query:
+        students = students.filter(
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+    context = {
+        'teacher': teacher,
+        'section': section,
+        'grade_levels': grade_levels,
+    }
+    return render(request, 'maintenace/teacher_list.html', context)

@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import User, UserProfile, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section
+from .models import User, UserProfile, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section, Teacher
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -110,6 +110,11 @@ class SubjectForm(forms.ModelForm):
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section
+        fields = '__all__'   
+
+class TeacherForm(forms.ModelForm):
+    class Meta:
+        model = Teacher
         fields = '__all__'   
    
 class LogoutForm(forms.Form):

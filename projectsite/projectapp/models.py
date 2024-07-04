@@ -138,26 +138,31 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
 
+class Teacher(models.Model):
+    first_name = models.CharField(max_length=100)
+    middle_name = models.CharField(max_length=100, null=True)
+    last_name = models.CharField(max_length=100)
+    address = models.TextField(help_text='Full Address')
+    contact_information = models.CharField(max_length=100, null=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
 class Section(models.Model):
     name = models.CharField(max_length=100)
     grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE)
+    adviser = models.OneToOneField(Teacher, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return self.name
-class Adviser(models.Model):
-    first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100, null=True, blank=True)
-    last_name = models.CharField(max_length=100)
-    grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE)
-    Section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE)
-
+    
 class StudentYearInfo(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
     grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, related_name='current_grade_level')
     school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE)
-    adviser = models.ForeignKey(Adviser, on_delete=models.CASCADE)
+    adviser = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     gen_ave = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     to_be_classified = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, related_name='next_grade_level')
     tdays_of_classes = models.IntegerField(null=True, blank=True)
