@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="wrapper">
+    {% include '../sidebar.html' %}
+    <div class="main-panel">
+        {% include '../navbar.html' %}
+        <div class="content">
+            <div class="container" style="margin-top: 20px;">
+                <h4 class="card-title"> Teacher List
+                    <button style="float:right" type="button" class="btn btn-info" data-toggle="modal" data-target="#addTeacherModal">
+                        <i class="glyphicon glyphicon-plus"></i> New Entry
+                    </button>
+                </h4>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <form id="filter-form" method="GET" action="{% url 'teacher-list' %}">
+                                <div class="input-group no-border" style="float:right; width:20%;">
+                                    <input type="text" style='height:40px;' name="search" value="{{ request.GET.search }}" class="form-control" placeholder="Search...">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="input-group-text"><i class="nc-icon nc-zoom-split"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-body">
+                            <div class="table">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="text-primary text-center">
+                                        <th>Name</th>
+                                        <th>Contact Information</th>
+                                        <th>Action</th>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        {% for teacher in teachers %}
+                                        <tr>
+                                            <td>{{ teacher.first_name }} {{ teacher.middle_name }} {{ teacher.last_name }}</td>
+                                            <td >{{ teacher.contact_information }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger" style="width:150px;">
+                                                    <a style='color:white;' href="#">
+                                                        <i class="fa fa-pen">
+                                                          Update
+                                                        </i>
+                                                    </a>
+                                                </button>
+                                                <button type="button" class="btn btn-warning" style="width:180px;">
+                                                    <a style='color:white;' href="#">
+                                                        <i class="fa fa-trash">
+                                                          Delete Teacher
+                                                        </i>
+                                                    </a>
+                                                </button>
+                                            </td>
+                                            
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'maintenance/teacher_add_modal.html' %}
+
+
+{% endblock %}

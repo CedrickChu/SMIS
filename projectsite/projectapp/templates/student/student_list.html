@@ -66,11 +66,16 @@
                                                         data-parent_guardian="{{ student.parent_guardians }}"
                                                         data-parent_guardian_address="{{ student.parent_guardians.address}}"
                                                         data-student_parent_guardian_contact="{{ student.parent_guardians.contact_information}}"
-                                                >
+                                                ><i class="fa fa-eye"></i>
                                                     View Profile
                                                 </button>
-                                                <a class="btn btn-warning" href="{% url 'student-delete' student.pk %}">Delete Student</a>
-
+                                                <button type="button" class="btn btn-warning" style="width:180px;">
+                                                    <a style='color:white;'href="{% url 'student-delete' student.pk %}">
+                                                        <i class="fa fa-trash">
+                                                          Delete Student
+                                                        </i>
+                                                    </a>
+                                                </button>
                                             </td>
                                         </tr>
                                         {% endfor %}

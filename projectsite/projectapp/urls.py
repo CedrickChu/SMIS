@@ -29,4 +29,6 @@ urlpatterns = [
     path('section/', views.section_list, name='section-list'),
     path('section/add/', views.add_section, name='section-add'),
     path('section/<int:pk>/update/', views.update_section, name='section-update'),
+    path('teachers/', views.teacher_list, name='teacher-list'),
+    path('teachers/add', views.add_teacher, name='teacher-add'),
 ]

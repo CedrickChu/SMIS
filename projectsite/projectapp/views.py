@@ -16,7 +16,7 @@ from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher
 from django.urls import reverse_lazy
-from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm
+from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm
 from django.db.models import Q 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -423,25 +423,33 @@ def update_section(request, pk):
     })
 
 
-def adviser_list(request):
-    teacher = Teacher.objects.all()
-    grade_levels = GradeLevel.objects.all()
-    section = Section.objects.all()
-    grade_level_filter = request.GET.get('grade_level')
+def teacher_list(request):
+    teachers = Teacher.objects.all()
     search_query = request.GET.get('search')
 
-    if grade_level_filter:
-        teacher = teacher.filter(grade_level_id=grade_level_filter)
-        
-
     if search_query:
-        students = students.filter(
+        teachers = teachers.filter(
             Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query)
+            Q(last_name__icontains=search_query) 
         )
     context = {
-        'teacher': teacher,
-        'section': section,
-        'grade_levels': grade_levels,
+        'teachers': teachers,
     }
-    return render(request, 'maintenace/teacher_list.html', context)
+    return render(request, 'maintenance/teacher_list.html', context)
+
+def add_teacher(request):
+    if request.method == 'POST':
+        teacher_form = TeacherForm(request.POST)
+        if teacher_form.is_valid():
+            teacher = teacher_form.save()
+            return JsonResponse({'success': True})
+        else:
+            errors = {
+                'errors': teacher_form.errors,
+            }
+            return JsonResponse(errors, status=400)
+
+    teacher_form = TeacherForm()
+    return render(request, 'maintenance/teacher_add_modal.html', {
+        'teacher_form': teacher_form,
+    })
