@@ -173,27 +173,24 @@ class StudentDeleteView(DeleteView):
         return response
     
 def subject_list(request):
+    search_query = request.GET.get('search', '')
+    grade_level_id = request.GET.get('grade_level', '')
+
     subjects = Subject.objects.all()
+    if search_query:
+        subjects = subjects.filter(name__icontains=search_query)
+    if grade_level_id:
+        subjects = subjects.filter(grade_level_id=grade_level_id)
+
     grade_levels = GradeLevel.objects.all()
-    grade_level_filter = request.GET.get('grade_level')
-    default_grade_level_id = 1  
-    
-    if grade_level_filter:
-        subjects = subjects.filter(grade_level_id=grade_level_filter)
-    else:
-        subjects = subjects.filter(grade_level_id=default_grade_level_id)
-    
-    subject_form = SubjectForm()
-    submit_label = 'Add Subject'  
+
     return render(request, 'maintenance/subject_list.html', {
         'subjects': subjects,
-        'subject_form': subject_form,
-        'submit_label': submit_label,
-        'form_title': 'Add Subject',
         'grade_levels': grade_levels,
-        'default_grade_level_id': default_grade_level_id,
+        'subject_form': SubjectForm(),
+        'form_title': 'Add Subject',
+        'submit_label': 'Add Subject',
     })
-
 
 def add_subject(request):
     if request.method == 'POST':
@@ -343,11 +340,12 @@ def add_year(request):
             return redirect('schoolyear-list')
     else:
         form = SchoolYearForm()
-    submit_label = 'Add Year'  
+    submit_label = 'Add Year'
     return render(request, 'maintenance/school_year.html', {
-        'grade_form': form,
+        'school_year_form': form,
         'submit_label': submit_label,
-        'form_title': 'Add School Year'  
+        'form_title': 'Add School Year',
+        'school_years': SchoolYear.objects.all()
     })
 
 def update_year(request, pk):

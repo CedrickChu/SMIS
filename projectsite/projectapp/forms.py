@@ -88,6 +88,14 @@ class ParentGuardianForm(forms.ModelForm):
     class Meta:
         model = ParentGuardian
         fields = '__all__'
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'middle_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.Textarea(attrs={'class': 'form-control'}),
+            'contact_information': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
 
 class GradeLevelForm(forms.ModelForm):
     class Meta:
