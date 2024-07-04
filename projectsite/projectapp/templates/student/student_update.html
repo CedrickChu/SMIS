@@ -8,7 +8,7 @@
         <div class="content">
             <div class="container container-fluid mx-auto">
                 <h2>Edit Student</h2>
-                <form method="post" action="">
+                <form id='student-update-form' method="post" action="">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col" >
@@ -80,16 +80,43 @@
                         <div class="col">
                             <div class="form-group" style="width: 550px;">
                                 <label for="id_parent_guardians">Parent/Guardians:</label>
-                                {{ form.parent_guardians}}
+                                {{ form.parent_guardians }}
                             </div>
                         </div>
                     </div>
-                    <button type="submit" style='margin-right:20px;' class="btn btn-danger">Save Changes</button>
+                    <button type="button" class="btn btn-danger" id="btn_submit" data-toggle="modal" data-target="#confirmationModal">Update</button>
                     <a href="{% url 'student-list' %}" class="btn btn-secondary">Cancel</a>
-                    
                 </form>
             </div>
         </div>
     </div>
 </div>
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationModalLabel">Confirm Submission</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to Update this student Information?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmSubmitButton">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('confirmSubmitButton').addEventListener('click', function() {
+            document.getElementById('student-update-form').submit();
+        });
+    });
+  </script>
 {% endblock %}

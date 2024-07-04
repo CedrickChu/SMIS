@@ -14,7 +14,6 @@
                         </div>
                         <div class="container" style="padding-top:20px;">
                             <form id="filter-form" method="GET" action="{% url 'section-list' %}">
-                                
                                 <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
                                     <select name="grade_level" class="form-control" style="height:40px;">
                                         {% for level in grade_levels %}
@@ -38,12 +37,10 @@
                                 <tbody>
                                     {% for section in sections %}
                                     <tr class="text-center">
-                             
                                         <td><input id="section{{ section.id }}" type="text" style="border:0px" value="{{ section.name }}" readonly></td>
                                         <td class="text-center">
-                                            <a href="#" onclick="editSection('{{ section.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
+                                            <a href="#" onclick="editSection('{{ section.id }}', '{{ section.grade_level.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
                                         </td>
-                                       
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -80,7 +77,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="grade_level">Grade Level</label>
-                                        <select style='height:40px;'class="form-control" id="grade_level" name="grade_level">
+                                        <select style='height:40px;' class="form-control" id="grade_level" name="grade_level" required>
                                             {% for level in grade_levels %}
                                                 <option value="{{ level.id }}">{{ level.name }}</option>
                                             {% endfor %}
@@ -127,10 +124,12 @@
         document.getElementById("filter-form").submit();
     }
 
-    function editSection(sectionId) {
+    function editSection(sectionId, gradeLevelId) {
         var sectionName = document.getElementById('section' + sectionId).value;
+        console.log(gradeLevelId);
         document.getElementById('section-form').action = "{% url 'section-update' pk=0 %}".replace('0', sectionId);
         document.getElementById('id').value = sectionId;
+        document.getElementById('grade_level').value = gradeLevelId; 
         document.getElementById('name').value = sectionName;
         document.getElementById('head').innerText = 'Edit Section';
         document.getElementById('btn_submit').innerText = 'Update Section';

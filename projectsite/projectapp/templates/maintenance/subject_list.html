@@ -1,5 +1,4 @@
-{% extends 'base.html' %}
-
+{% extends 'base.html'%}
 {% block content %}
 <div class="wrapper">
     {% include '../sidebar.html' %}
@@ -47,7 +46,7 @@
                                         <td><input id="subject{{ subject.id }}" type="text" style="border:0px" value="{{ subject.name }}" readonly></td>
                                         <td><input id="grade-level{{ subject.id }}" type="text" style="border:0px" value="{{ subject.grade_level.name }}" readonly></td>
                                         <td class="text-center">
-                                            <a href="#" onclick="editSubject('{{ subject.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
+                                            <a href="#" onclick="editSubject('{{ subject.id }}', '{{ subject.grade_level.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -59,7 +58,7 @@
                 <div class="col-md-4">
                     <div class="container frm-new">
                         <div class="row main">
-                            <div class="main-login main-center">
+                            <div class="main-login main-center" style="padding:20px;">
                                 <h3 id="head">{{ form_title }}</h3>
                                 <form id="subject-form" method="post" action="{% url 'subject-add' %}">
                                     {% csrf_token %}
@@ -110,16 +109,15 @@
     function filterSubjects() {
         document.getElementById("filter-form").submit();
     }
-
-    function editSubject(subjectId) {
+    function editSubject(subjectId, gradeLevelId) {
         var subjectName = document.getElementById('subject' + subjectId).value;
-        var gradeLevel = document.getElementById('grade-level' + subjectId).value;
         document.getElementById('subject-form').action = "{% url 'subject-update' pk=0 %}".replace('0', subjectId);
         document.getElementById('id').value = subjectId;
         document.getElementById('name').value = subjectName;
-        document.getElementById('grade_level').value = gradeLevel;
+        document.getElementById('grade_level').value = gradeLevelId; 
         document.getElementById('head').innerText = 'Edit Subject';
         document.getElementById('btn_submit').innerText = 'Update Subject';
+
     }
 
     function resetForm() {

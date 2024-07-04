@@ -26,7 +26,7 @@
                                 </div>
                                 <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
                                     <select name="grade_level" class="form-control" style="height:40px;">
-                                        <option value="">Select Grade Level</option>
+                                        <option value="">Select Grade Level (Default All)</option>
                                         {% for level in grade_levels %}
                                         <option value="{{ level.id }}" {% if request.GET.grade_level == level.id|stringformat:'s' %} selected {% endif %}>{{ level.name }}</option>
                                         {% endfor %}
