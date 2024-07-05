@@ -7,9 +7,11 @@
         <div class="content">
             <div class="container" style="margin-top: 20px;">
                 <h4 class="card-title"> Teacher List
+                    {% if request.user.is_superuser%}
                     <button style="float:right" type="button" class="btn btn-info" data-toggle="modal" data-target="#addTeacherModal">
                         <i class="glyphicon glyphicon-plus"></i> New Entry
                     </button>
+                    {% endif %}
                 </h4>
             </div>
             <hr>
@@ -32,7 +34,9 @@
                                     <thead class="text-primary text-center">
                                         <th>Name</th>
                                         <th>Contact Information</th>
+                                        {% if request.user.is_superuser %}
                                         <th>Action</th>
+                                        {% endif %}
                                     </thead>
                                     <tbody class="text-center">
                                         {% for teacher in teachers %}
@@ -40,22 +44,24 @@
                                             <td>{{ teacher.first_name }} {{ teacher.middle_name }} {{ teacher.last_name }}</td>
                                             <td >{{ teacher.contact_information }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-danger" style="width:150px;">
-                                                    <a style='color:white;' href="#">
+                                                {% if request.user.is_superuser %}
+                                                <button style="width:180px;" type="button" class="btn btn-danger" data-toggle="modal" data-target="#updateTeacherModal">
+                                                    <a style='color:white;'>
                                                         <i class="fa fa-pen">
                                                           Update
                                                         </i>
                                                     </a>
                                                 </button>
-                                                <button type="button" class="btn btn-warning" style="width:180px;">
+                                               
+                                                <button type="button" class="btn btn-warning" style="width:180px; margin-left: 20px;">
                                                     <a style='color:white;' href="#">
                                                         <i class="fa fa-trash">
-                                                          Delete Teacher
+                                                          Delete
                                                         </i>
                                                     </a>
                                                 </button>
+                                                {% endif %}
                                             </td>
-                                            
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -69,6 +75,8 @@
     </div>
 </div>
 {% include 'maintenance/teacher_add_modal.html' %}
+
+{% include 'maintenance/teacher_update_modal.html' %}
 
 
 {% endblock %}

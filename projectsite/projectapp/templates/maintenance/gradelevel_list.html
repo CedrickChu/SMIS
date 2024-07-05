@@ -17,16 +17,20 @@
                                 <thead>
                                     <tr class="text-center">
                                         <th >Grade</th>
+                                        {% if request.user.is_superuser %}
                                         <th >Action</th>
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for grade in grades %}
                                     <tr class="text-center">
                                         <td><input id="grade{{ grade.id }}" type="text" style="border:0px" value="{{ grade.name }}" readonly></td>
+                                        {% if request.user.is_superuser %}
                                         <td>
                                             <a href="#" onclick="editGrade('{{ grade.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
                                         </td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -34,6 +38,7 @@
                         </div>
                     </div>
                 </div>
+                {% if request.user.is_superuser %}
                 <div class="col-md-4">
                     <div class="container frm-new">
                         <div class="row main">
@@ -71,6 +76,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

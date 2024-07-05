@@ -31,4 +31,5 @@ urlpatterns = [
     path('section/<int:pk>/update/', views.update_section, name='section-update'),
     path('teachers/', views.teacher_list, name='teacher-list'),
     path('teachers/add', views.add_teacher, name='teacher-add'),
+    path('teachers/<int:pk>/update/', views.update_teacher, name='teacher-update'),
 ]

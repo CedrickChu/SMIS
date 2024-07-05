@@ -19,7 +19,9 @@
                                         <th style="width:20%">School Year</th>
                                         <th>Start Date</th>
                                         <th>End Date</th>
+                                        {% if request.user.is_superuser   %}
                                         <th style="width:10%">Action</th>
+                                        {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -34,11 +36,13 @@
                                         <td>
                                             <input id="year-end-date-{{ year.id }}" type="date" style="border:0px" value="{{ year.end_date|date:'Y-m-d' }}" readonly>
                                         </td>
+                                        {% if request.user.is_superuser %}
                                         <td>
                                             <a href="#" onclick="editYear('{{ year.id }}')" class="btn btn-info">
                                                 <i class="fa fa-pen" aria-hidden="true"></i> Edit
                                             </a>
                                         </td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -46,6 +50,7 @@
                         </div>
                     </div>
                 </div>
+                {% if request.user.is_superuser %}
                 <div class="col-md-4">
                     <div class="container frm-new">
                         <div class="row main">
@@ -106,7 +111,10 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
+               
             </div>
+           
         </div>
     </div>
 </div>

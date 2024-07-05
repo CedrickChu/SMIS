@@ -21,6 +21,7 @@
             <p><strong>Parent or Guardian Contact Details:</strong> <span id="modal-student-parent_guardian_contact"></span></p>
         </div>
         <div class="modal-footer">
+            {% if request.user.is_superuser %}
             <button type="button" class="btn btn-danger" style="width:150px;">
                 <a style='color:white;' href="{% url 'student-update' student.id %}">
                     <i class="fa fa-pen">
@@ -28,6 +29,7 @@
                     </i>
                 </a>
             </button>
+            {% endif %}
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>

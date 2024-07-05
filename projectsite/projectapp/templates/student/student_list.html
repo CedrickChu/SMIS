@@ -7,9 +7,11 @@
         <div class="content">
             <div class="container" style="margin-top: 20px;">
                 <h4 class="card-title"> Student List
+                    {% if request.user.is_superuser %}
                     <button style="float:right" type="button" class="btn btn-info" data-toggle="modal" data-target="#addStudentModal">
                         <i class="glyphicon glyphicon-plus"></i> New Entry
                     </button>
+                    {% endif %}
                 </h4>
             </div>
             <hr>
@@ -69,6 +71,7 @@
                                                 ><i class="fa fa-eye"></i>
                                                     View Profile
                                                 </button>
+                                                {% if request.user.is_superuser %}
                                                 <button type="button" class="btn btn-warning" style="width:180px;">
                                                     <a style='color:white;'href="{% url 'student-delete' student.pk %}">
                                                         <i class="fa fa-trash">
@@ -76,6 +79,7 @@
                                                         </i>
                                                     </a>
                                                 </button>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% endfor %}

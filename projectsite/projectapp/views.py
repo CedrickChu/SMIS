@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.db.models import Prefetch
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
@@ -34,8 +34,12 @@ from django.db import transaction
 #             return redirect(reverse('email_verification_required'))
 #     return wrapped_view
 
+def is_superuser(user):
+    return user.is_superuser
 
 def login_view(request):
+    if request.user.is_authenticated:
+         return redirect('home')
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -94,12 +98,13 @@ def logout_view(request):
 
 #     return render(request, 'account/verification_sent.html', {'message': message})
 
+
+@login_required
 def student_list(request):
     students = Student.objects.all()
     grade_levels = GradeLevel.objects.all()
     grade_level_filter = request.GET.get('grade_level')
     search_query = request.GET.get('search')
-
     if grade_level_filter:
         students = students.filter(grade_level_id=grade_level_filter)
 
@@ -119,23 +124,35 @@ def student_list(request):
     }
     return render(request, 'student/student_list.html', context)
 
+@login_required
 def dashboard(request):
     return render(request, 'dashboard.html')
 
+@user_passes_test(is_superuser)
+@login_required
 def student_update(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     if request.method == 'POST':
-        form = StudentForm(request.POST, instance=student)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Student edited successfully!')
-            return redirect('student-list')
+        if request.user.is_superuser:
+            form = StudentForm(request.POST, instance=student)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Student edited successfully!')
+                return redirect('student-list')
+        else:
+            messages.error(request, 'You do not have permission to edit student records.')
+            form = StudentForm(instance=student)
     else:
         form = StudentForm(instance=student)
+        if not request.user.is_superuser:
+            for field in form.fields.values():
+                field.widget.attrs['readonly'] = True
 
     return render(request, 'student/student_update.html', {'form': form})
 
 
+@user_passes_test(is_superuser)
+@login_required
 def add_student(request):
     if request.method == 'POST':
         student_form = StudentForm(request.POST)
@@ -147,6 +164,7 @@ def add_student(request):
             student.parent_guardians = parent_guardian
             student.save()
             return JsonResponse({'success': True})
+        
         errors = {
             'errors': student_form.errors,
             'parent_guardian_errors': parent_guardian_form.errors,
@@ -160,6 +178,7 @@ def add_student(request):
         'parent_guardian_form': parent_guardian_form,
     })
 
+
 class StudentDeleteView(DeleteView):
     model = Student
     template_name = 'student/student_confirm_delete.html'
@@ -171,7 +190,9 @@ class StudentDeleteView(DeleteView):
     def delete(self, request, *args, **kwargs):
         response = super().delete(request, *args, **kwargs)
         return response
-    
+
+
+@login_required
 def subject_list(request):
     search_query = request.GET.get('search', '')
     grade_level_id = request.GET.get('grade_level', '')
@@ -192,6 +213,8 @@ def subject_list(request):
         'submit_label': 'Add Subject',
     })
 
+@user_passes_test(is_superuser)
+@login_required
 def add_subject(request):
     if request.method == 'POST':
         form = SubjectForm(request.POST)
@@ -207,6 +230,9 @@ def add_subject(request):
         'form_title': 'Add Subject'  
     })
 
+
+@user_passes_test(is_superuser)
+@login_required
 def update_subject(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     if request.method == 'POST':
@@ -228,6 +254,7 @@ def update_subject(request, pk):
 #     template_name = 'grades/schoolyear_list.html'
 #     context_object_name = 'schoolyears'
 
+@login_required
 def grade_list(request):
     grades = GradeLevel.objects.order_by('id')
     grade_form = GradeLevelForm()
@@ -240,6 +267,8 @@ def grade_list(request):
     })
 
 
+@user_passes_test(is_superuser)
+@login_required
 def add_grade(request):
     if request.method == 'POST':
         form = GradeLevelForm(request.POST)
@@ -255,6 +284,8 @@ def add_grade(request):
         'form_title': 'Add Grade'  
     })
 
+@user_passes_test(is_superuser)
+@login_required
 def update_grade(request, pk):
     grade = get_object_or_404(GradeLevel, pk=pk)
     if request.method == 'POST':
@@ -271,6 +302,7 @@ def update_grade(request, pk):
         'form_title': 'Edit Grade'  
     })
 
+@login_required
 def student_report(request):
     students = Student.objects.all()
     grade_levels = GradeLevel.objects.all()
@@ -288,6 +320,7 @@ def student_report(request):
     }
     return render(request, 'report/student_record.html', context)
 
+@login_required
 def student_report_card(request):
     student_year_infos = StudentYearInfo.objects.all()
     grade_levels = GradeLevel.objects.all()
@@ -299,6 +332,7 @@ def student_report_card(request):
     }
     return render(request, 'report/student_report_card.html', context)
 
+@login_required
 def student_record_view(request, id):
     student_infos = get_object_or_404(StudentYearInfo, id=id)
     school_years = SchoolYear.objects.all()
@@ -312,6 +346,7 @@ def student_record_view(request, id):
     }
     return render(request, 'report/student_info.html', context)
 
+@login_required
 def student_form137(request, pk):
     student = get_object_or_404(Student, pk=pk)
     context = {
@@ -319,7 +354,7 @@ def student_form137(request, pk):
     }
     return render(request, 'report/form137.html', context)
 
-
+@login_required
 def school_year(request):
     school_years = SchoolYear.objects.all()
     school_year_form = SchoolYearForm()
@@ -332,6 +367,8 @@ def school_year(request):
     })
 
 
+@user_passes_test(is_superuser)
+@login_required
 def add_year(request):
     if request.method == 'POST':
         form = SchoolYearForm(request.POST)
@@ -348,6 +385,8 @@ def add_year(request):
         'school_years': SchoolYear.objects.all()
     })
 
+@user_passes_test(is_superuser)
+@login_required
 def update_year(request, pk):
     year = get_object_or_404(SchoolYear, pk=pk)
     if request.method == 'POST':
@@ -364,7 +403,7 @@ def update_year(request, pk):
         'form_title': 'Edit School Year'  
     })
 
-
+@login_required
 def section_list(request):
     sections = Section.objects.all()
     grade_levels = GradeLevel.objects.all()
@@ -389,7 +428,8 @@ def section_list(request):
         'default_grade_level_id': default_grade_level_id,
     })
 
-
+@user_passes_test(is_superuser)
+@login_required
 def add_section(request):
     if request.method == 'POST':
         section_form = SectionForm(request.POST)
@@ -406,6 +446,8 @@ def add_section(request):
         'form_title': 'Add Section'  
     })
 
+@user_passes_test(is_superuser)
+@login_required
 def update_section(request, pk):
     section = get_object_or_404(Section, pk=pk)
     if request.method == 'POST':
@@ -422,7 +464,7 @@ def update_section(request, pk):
         'form_title': 'Edit Section'  
     })
 
-
+@login_required
 def teacher_list(request):
     teachers = Teacher.objects.all()
     search_query = request.GET.get('search')
@@ -437,6 +479,8 @@ def teacher_list(request):
     }
     return render(request, 'maintenance/teacher_list.html', context)
 
+@user_passes_test(is_superuser)
+@login_required
 def add_teacher(request):
     if request.method == 'POST':
         teacher_form = TeacherForm(request.POST)
@@ -451,5 +495,26 @@ def add_teacher(request):
 
     teacher_form = TeacherForm()
     return render(request, 'maintenance/teacher_add_modal.html', {
+        'teacher_form': teacher_form,
+    })
+
+@user_passes_test(is_superuser)
+@login_required
+def update_teacher(request, teacher_id):
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+    if request.method == 'POST':
+        teacher_form = TeacherForm(request.POST, instance=teacher)
+        if teacher_form.is_valid():
+            teacher_form.save()
+            return JsonResponse({'success': True})
+        else:
+            errors = {
+                'errors': teacher_form.errors,
+            }
+            return JsonResponse(errors, status=400)
+
+    teacher_form = TeacherForm(instance=teacher)
+    return render(request, 'maintenance/teacher_update_modal.html', {
+        'teacher': teacher,
         'teacher_form': teacher_form,
     })

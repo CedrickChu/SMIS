@@ -216,3 +216,43 @@ class Form137(models.Model):
     
 
 
+class Payment(models.Model):
+    payment_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date_paid = models.DateField(auto_now_add=True)
+    payment_method = models.CharField(max_length=50)
+    status = models.CharField(max_length=20, choices=[
+        ('paid', 'Paid'),
+        ('pending', 'Pending'),
+        ('refunded', 'Refunded'),
+    ])
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.student}'s Tuition Fee Payment"
+    
+class EventCategory(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+class Event(models.Model):
+    """
+    Represents an event organized by the institution.
+    
+    Fields:
+    - title: The title of the event.
+    - category: The target audience or participants of the event.
+    """
+    title = models.CharField(max_length=200)
+    note = models.CharField(max_length=500)
+    color = models.CharField(max_length=20)
+    category = models.ForeignKey(EventCategory, on_delete=models.CASCADE)
+    start_date_time = models.DateTimeField()
+    end_date_time = models.DateTimeField()
+
+    def __str__(self):
+        return self.title
+
