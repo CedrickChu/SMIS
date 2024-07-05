@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher
+from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher, StudentInfo
 from django.urls import reverse_lazy
 from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm
 from django.db.models import Q 
@@ -101,7 +101,7 @@ def logout_view(request):
 
 @login_required
 def student_list(request):
-    students = Student.objects.all()
+    students = StudentInfo.objects.all()
     grade_levels = GradeLevel.objects.all()
     grade_level_filter = request.GET.get('grade_level')
     search_query = request.GET.get('search')
@@ -123,6 +123,18 @@ def student_list(request):
         'grade_levels': grade_levels,
     }
     return render(request, 'student/student_list.html', context)
+
+class PrintStudentListView(ListView):
+    model = Student
+    template_name = 'student/print_student.html'
+    context_object_name = 'students'
+    paginate_by = 30  
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['school'] = { 'address': 'Km.5 Tiniguiban Hi-Way, Puerto Princesa City', 'contact_number': 'Tel. # (048) 434 - 0041'}
+        context['grade_level'] = 'Grade Level'  
+        context['school_year'] = 'School Year'  
+        return context
 
 @login_required
 def dashboard(request):

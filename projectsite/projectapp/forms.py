@@ -59,7 +59,7 @@ class StudentForm(forms.ModelForm):
             'address': forms.Textarea(attrs={'class': 'form-control'}),
             'parent_guardians': forms.Select(attrs={'class': 'form-control', 'style': 'height:40px;'}),
         }
-    
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['parent_guardians'].required = False

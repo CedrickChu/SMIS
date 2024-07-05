@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, UserProfile, SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, School, Form137, Teacher, StudentYearInfo, TotalGradeSubject, Section
+from .models import User, UserProfile, SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, School, Form137, Teacher, StudentYearInfo, TotalGradeSubject, Section, StudentInfo
 from .widgets import PastCustomDatePickerWidget
 from django.db import models
 
@@ -35,21 +35,22 @@ admin.site.register(SchoolYear)
 admin.site.register(GradeLevel)
 admin.site.register(Subject)
 admin.site.register(Section)
-
 admin.site.register(ParentGuardian)
+admin.site.register(StudentInfo)
+
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateField: {'widget': PastCustomDatePickerWidget},
     }
-    list_display = ['lrn','first_name', 'middle_name', 'last_name', 'birth_date', 'place_of_birth','grade_level','gender','address','promoted', ]
+    list_display = ['lrn','first_name', 'middle_name', 'last_name', 'birth_date', 'place_of_birth', 'gender','address','promoted', ]
     search_fields = ['first_name', 'last_name']
-    list_filter = ['grade_level', 'promoted']
+    list_filter = ['promoted']
 
     fieldsets = (
         (None, {
-            'fields': ('lrn','first_name','middle_name', 'last_name', 'birth_date', 'place_of_birth','grade_level', 'gender','address','parent_guardians','promoted')
+            'fields': ('lrn','first_name','middle_name', 'last_name', 'birth_date', 'place_of_birth', 'gender','address','parent_guardians','promoted')
         }),
     )
 @admin.register(School)
@@ -89,3 +90,4 @@ class TotalGradeSubjectAdmin(admin.ModelAdmin):
     list_filter = ('SYI_ID__school_year', 'SYI_ID__student__last_name', 'SYI_ID__grade_level')
     search_fields = ('SYI_ID__student__first_name', 'SYI_ID__student__last_name', 'SUBJECT__name')
     ordering = ('-SYI_ID__school_year', 'SYI_ID__student__last_name', 'SYI_ID__student__first_name')
+

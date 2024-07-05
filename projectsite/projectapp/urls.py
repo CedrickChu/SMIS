@@ -12,6 +12,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('student/edit/<int:student_id>/', views.student_update, name='student-update'),
     path('student/add/', views.add_student, name='student-add'),
+    path('student/print/', views.PrintStudentListView.as_view(), name='student-print'),
     path('student/<int:pk>/delete/', views.StudentDeleteView.as_view(), name='student-delete'),
     path('gradelevel/', views.grade_list, name='grade-level'),
     path('gradelevel/add/', views.add_grade, name='grade-add'),

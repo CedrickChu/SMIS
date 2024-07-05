@@ -114,30 +114,7 @@ class School(models.Model):
 
     def __str__(self):
         return self.name
-
-class Student(models.Model):
-    lrn = models.CharField(max_length=20, unique=True, help_text='Learner Reference Number', null=True)
-    first_name = models.CharField(max_length=50)
-    middle_name = models.CharField(max_length=50, null=True)
-    last_name = models.CharField(max_length=50)
-    birth_date = models.DateField()
-    place_of_birth = models.TextField(help_text='Birth Address')  
-    grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
-    gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')], default='M')
-    address = models.TextField(help_text='Full Address')
-    parent_guardians = models.ForeignKey(ParentGuardian,  on_delete=models.SET_NULL, null=True, help_text='List of Parents/Guardians')
-    promoted = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
-class Subject(models.Model):
-    name = models.CharField(max_length=100)
-    grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-
+    
 class Teacher(models.Model):
     first_name = models.CharField(max_length=100)
     middle_name = models.CharField(max_length=100, null=True)
@@ -157,6 +134,35 @@ class Section(models.Model):
     def __str__(self):
         return self.name
     
+class Student(models.Model):
+    lrn = models.CharField(max_length=20, unique=True, help_text='Learner Reference Number', null=True)
+    first_name = models.CharField(max_length=50)
+    middle_name = models.CharField(max_length=50, null=True)
+    last_name = models.CharField(max_length=50)
+    birth_date = models.DateField()
+    place_of_birth = models.TextField(help_text='Birth Address')
+    gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')], default='M')
+    address = models.TextField(help_text='Full Address')
+    parent_guardians = models.ForeignKey(ParentGuardian,  on_delete=models.SET_NULL, null=True, help_text='List of Parents/Guardians')
+    promoted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+    
+class StudentInfo(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
+
+class Subject(models.Model):
+    name = models.CharField(max_length=100)
+    grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    
 class StudentYearInfo(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
@@ -175,7 +181,7 @@ class StudentYearInfo(models.Model):
 
     def __str__(self):
         return f'{self.student} - Grade {self.grade_level} - {self.school_year}'
-    
+       
 class TotalGradeSubject(models.Model):
     TGS_ID = models.AutoField(primary_key=True)
     STUDENT_ID = models.ForeignKey(Student, on_delete=models.CASCADE)
