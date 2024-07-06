@@ -36,6 +36,10 @@
                                         <td>
                                             <input id="year-end-date-{{ year.id }}" type="date" style="border:0px" value="{{ year.end_date|date:'Y-m-d' }}" readonly>
                                         </td>
+                                        <td>
+                                            <input id="year-status-{{ year.id }}" type="text" style="border:0px" value="{% if year.status %}Current{% else %}Inactive{% endif %}" readonly>
+
+                                        </td>
                                         {% if request.user.is_superuser %}
                                         <td>
                                             <a href="#" onclick="editYear('{{ year.id }}')" class="btn btn-info">
@@ -101,6 +105,15 @@
                                             </p>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="status" class="cols-sm-2 control-label">Status</label>
+                                        <div class="cols-sm-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"></span>
+                                                <input type="text" class="form-control" id="status" name="status" style="width:200px" value="{% if year.status %}Current{% else %}Inactive{% endif %}"" required>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div id="status"></div>
                                     <div class="form-group">
                                         <input type="button" class="btn btn-info" id="reset" name="reset" value="Cancel" onclick="resetForm()">
@@ -145,11 +158,13 @@
         var yearName = document.getElementById('year-name-' + yearId).value;
         var startDate = document.getElementById('year-start-date-' + yearId).value;
         var endDate = document.getElementById('year-end-date-' + yearId).value;
+        var status = document.getElementById('year-status-' + yearId).value;
         document.getElementById('year-form').action = "{% url 'year-update' pk=0 %}".replace('0', yearId);
         document.getElementById('id').value = yearId;
         document.getElementById('year').value = yearName;
         document.getElementById('start_date').value = startDate;
         document.getElementById('end_date').value = endDate;
+        document.getElementById('status').value = status;
         document.getElementById('head').innerText = 'Edit Year';
         document.getElementById('btn_submit').innerText = 'Update Year';
     }
@@ -160,6 +175,7 @@
         document.getElementById('year').value = '';
         document.getElementById('start_date').value = '';
         document.getElementById('end_date').value = '';
+        document.getElementById('status').value = '';
         document.getElementById('head').innerText = '{{ form_title }}';
         document.getElementById('btn_submit').innerText = '{{ submit_label }}';
     }

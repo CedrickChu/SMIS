@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import User, UserProfile, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section, Teacher
+from .models import User, UserProfile, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section, Teacher, StudentInfo
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -54,15 +54,12 @@ class StudentForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'birth_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'place_of_birth': forms.Textarea(attrs={'class': 'form-control'}),
-            'grade_level': forms.Select(attrs={'class': 'form-control', 'style': 'height:40px;'}),
             'gender': forms.Select(attrs={'class': 'form-control', 'style': 'height:40px;'}),
             'address': forms.Textarea(attrs={'class': 'form-control'}),
             'parent_guardians': forms.Select(attrs={'class': 'form-control', 'style': 'height:40px;'}),
         }
-        
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['parent_guardians'].required = False
+
+
 
 
 class SubjectForm(forms.ModelForm):
@@ -97,6 +94,24 @@ class ParentGuardianForm(forms.ModelForm):
         }
 
 
+class CombinedForm(forms.Form):
+    student = StudentForm()
+    parent_guardian = ParentGuardianForm()
+
+    def is_valid(self):
+        return self.student.is_valid() and self.parent_guardian.is_valid()
+
+    def save(self, commit=True):
+        student = self.student.save(commit=False)
+        parent_guardian = self.parent_guardian.save(commit=False)
+        
+        if commit:
+            parent_guardian.save()
+            student.parent_guardians = parent_guardian
+            student.save()
+        return student
+
+
 class GradeLevelForm(forms.ModelForm):
     class Meta:
         model = GradeLevel
@@ -117,6 +132,12 @@ class TeacherForm(forms.ModelForm):
         model = Teacher
         fields = '__all__'   
    
+
+class StudentInfoForm(forms.ModelForm):
+    class Meta:
+        model = StudentInfo
+        fields = '__all__'   
+
 class LogoutForm(forms.Form):
     pass
 

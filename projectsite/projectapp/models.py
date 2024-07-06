@@ -85,12 +85,13 @@ class UserProfile(models.Model):
         return self.user.username
 
 class SchoolYear(models.Model):
-    year = models.CharField(max_length=9)  
+    year = models.CharField(max_length=9)
     start_date = models.DateField()
     end_date = models.DateField()
+    status = models.BooleanField(default=False, help_text='Is this the current school year?')
 
     def __str__(self):
-        return self.year
+        return f"{self.year} ({self.start_date.year}-{self.end_date.year})"
 
 class GradeLevel(models.Model):
     name = models.CharField(max_length=50) 

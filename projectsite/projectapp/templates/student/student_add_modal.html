@@ -1,3 +1,30 @@
+<!-- Student Modal -->
+ <style>
+    
+  button.read-more-info-icon:hover {
+      overflow: visible;
+  }
+  button.read-more-info-icon .hidden-info {
+      position: absolute;
+      top: 23px;
+      width: 220px;
+      text-align: left;
+      background: black;
+      padding: 10px;
+      opacity: 0;
+      transition: opacity .25s ease-in-out;
+    color:#fff;
+  }
+  button.read-more-info-icon.modal-left .hidden-info { 
+      right: 0;
+  }
+  button.read-more-info-icon.modal-right .hidden-info { 
+      left: 0;
+  }
+  button.read-more-info-icon:hover .hidden-info {
+      opacity: 1;
+  }
+ </style>
 <div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-labelledby="addStudentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
@@ -40,7 +67,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-auto" style="width: 380px;">
+                            <div class="col-md-auto" style="width: 333px;">
                                 <div class="form-group">
                                     <label for="birth_date">Birth Date:</label>
                                     <input class="form-control" type="date" name="birth_date" required>
@@ -54,7 +81,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-auto" style="width: 380px;">
+                            <div class="col-md-auto" style="width: 333px;">
                                 <div class="form-group">
                                     <label for="gender">Gender:</label>
                                     <select style='height:40px;' class="form-control" name="gender" required>
@@ -62,14 +89,7 @@
                                         <option value="F">Female</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label for="grade_level">Grade Level:</label>
-                                    <select style='height:40px;' class="form-control" name="grade_level" required>
-                                        {% for level in grade_levels %}
-                                            <option value="{{ level.id }}">{{ level.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
+                                
     
                             </div>
                             <div class="col">
@@ -79,48 +99,24 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Parent/Guardian Information -->
-                    {{ parent_guardian_form.as_p }}
-                    <hr style="height:2px; color:black; background-color: black;">
-                    <h5>Parent/Guardian Information</h5>
-                    <div class="container" style="width:90%;">
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="parent_first_name"></label>
-                                    <input class="form-control" type="text" name="parent_first_name" placeholder="Parent First Name:">
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="parent_middle_name"></label>
-                                    <input class="form-control" type="text" name="parent_middle_name" placeholder="Parent Middle Name:">
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="parent_last_name"></label>
-                                    <input class="form-control" type="text" name="parent_last_name" placeholder="Parent Middle Name:" required>
+                                    <label for="parent_guardians">Parent/Guardian</label>
+                                    <div class="d-flex">
+                                        <select class="form-control mr-2" name="parent_guardians" style="height: 40px; width: 303px;" required>
+                                            {% for parent_guardian in parent_guardians %}
+                                                <option value="{{ parent_guardian.id }}">{{ parent_guardian.first_name }} {{ parent_guardian.last_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button style="background-color:white;border: none;" class='read-more-info-icon' type="button" data-toggle="modal" data-target="#parentGuardianModal">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="hidden-info">Add Parent/Guardian </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="parent_address"></label>
-                                    <textarea class="form-control" name="parent_address" rows="3" placeholder="Parent/Guardian Address:" required></textarea>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="contact_information"></label>
-                                    <input class="form-control" type="text" name="contact_information" placeholder="Parent Contact Information" required>
-                                </div>
-    
-                            </div>
-                        </div> 
-
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -132,45 +128,41 @@
     </div>
 </div>
 
+{% include 'student/parent_add_modal.html' %}
+
 <script>
     $(document).ready(function() {
-      $('#addStudentForm').submit(function(event) {
-        event.preventDefault(); 
-        var formData = $(this).serialize();
-  
-        $.ajax({
-          type: 'POST',
-          url: $(this).attr('action'),
-          data: formData,
-          success: function(response) {
-            if (response.success) {
-                window.location.href = "{% url 'student-list'%}";
-                alert('Student added successfully');
-                $('#addStudentModal').modal('hide');
-              
-            } else {
-              console.error('Unexpected response:', response);
-            }
-          },
-          error: function(xhr, status, error) {
-            console.error('AJAX Error:', error);
-            var errors = xhr.responseJSON.errors;
-            var parentGuardianErrors = xhr.responseJSON.parent_guardian_errors;
-  
-            $('#form-errors').html('');
-            if (errors) {
-              $.each(errors, function(field, errors) {
-                $('#form-errors').append('<p>' + field + ': ' + errors.join(', ') + '</p>');
-              });
-            }
-            if (parentGuardianErrors) {
-              $.each(parentGuardianErrors, function(field, errors) {
-                $('#form-errors').append('<p>' + field + ': ' + errors.join(', ') + '</p>');
-              });
-            }
-            $('#form-errors').show();
-          }
+        $('#addStudentForm').submit(function(event) {
+            event.preventDefault(); 
+            var formData = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    if (response.success) {
+                        window.location.href = "{% url 'student-list' %}";
+                        alert('Student added successfully');
+                        $('#addStudentModal').modal('hide');
+                    } else {
+                        $('#add-student-errors').html('');
+                        $.each(response.errors, function(field, error) {
+                            $('#add-student-errors').append('<p>' + field + ': ' + error.join(', ') + '</p>');
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    var errors = xhr.responseJSON.errors;
+                    $('#add-student-errors').html('');
+                    if (errors) {
+                        $.each(errors, function(field, error) {
+                            $('#add-student-errors').append('<p>' + field + ': ' + error.join(', ') + '</p>');
+                        });
+                    }
+                    $('#add-student-errors').show();
+                }
+            });
         });
-      });
     });
-  </script>
+</script>

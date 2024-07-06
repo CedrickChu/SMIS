@@ -16,7 +16,7 @@ from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher, StudentInfo
 from django.urls import reverse_lazy
-from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm
+from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm, StudentInfoForm, ParentGuardianForm
 from django.db.models import Q 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -101,28 +101,76 @@ def logout_view(request):
 
 @login_required
 def student_list(request):
-    students = StudentInfo.objects.all()
-    grade_levels = GradeLevel.objects.all()
-    grade_level_filter = request.GET.get('grade_level')
+    students = Student.objects.all()
+    parent_guardians = ParentGuardian.objects.all()
     search_query = request.GET.get('search')
-    if grade_level_filter:
-        students = students.filter(grade_level_id=grade_level_filter)
-
     if search_query:
         students = students.filter(
             Q(first_name__icontains=search_query) |
             Q(last_name__icontains=search_query) |
             Q(lrn__icontains=search_query)
         )
-    print("Grade Level Filter:", grade_level_filter)
     print("Search Query:", search_query)
     print("Students Count:", students.count())
 
     context = {
         'students': students,
-        'grade_levels': grade_levels,
+        'parent_guardians': parent_guardians
     }
     return render(request, 'student/student_list.html', context)
+
+@login_required
+def allStudent_list(request):
+    student_infos = StudentInfo.objects.all()
+    grade_level_filter = request.GET.get('grade_level')
+    school_level_filter = request.GET.get('school_year')
+    search_query = request.GET.get('search')
+    if grade_level_filter:
+        student_infos = student_infos.filter(grade_level_id=grade_level_filter)
+    if school_level_filter:
+        student_infos = student_infos.filter(school_year_id=school_level_filter)
+
+    if search_query:
+        student_infos = student_infos.filter(
+            Q(student__first_name__icontains=search_query) |
+            Q(student__last_name__icontains=search_query) |
+            Q(student__lrn__icontains=search_query)
+        )
+    grade_levels = GradeLevel.objects.all()
+    school_years = SchoolYear.objects.all()
+    students = [info.student for info in student_infos]
+    allStudents = Student.objects.all()
+    sections = Section.objects.all()
+    
+    context = {
+        'student_infos': student_infos,
+        'grade_levels': grade_levels,
+        'students': students,
+        'school_years': school_years,
+        'allStudents': allStudents,
+        'sections': sections,
+    }
+    return render(request, 'student/all_student_list.html', context)
+
+
+@user_passes_test(is_superuser)
+@login_required
+def add_generic_student(request):
+    if request.method == 'POST':
+        student_form = StudentInfoForm(request.POST)
+        students = Student.objects.all()
+        if student_form.is_valid():
+            student_form.save()
+            return JsonResponse({'success': True})
+        
+        errors = {
+            'errors': student_form.errors,
+        }
+        return JsonResponse(errors, status=400)
+    student_form = StudentInfoForm()
+    return render(request, 'student/studentinfo_add_modal.html', {
+        'student_form': student_form, 'students': students,
+    })
 
 class PrintStudentListView(ListView):
     model = Student
@@ -168,28 +216,19 @@ def student_update(request, student_id):
 def add_student(request):
     if request.method == 'POST':
         student_form = StudentForm(request.POST)
-        parent_guardian_form = ParentGuardianForm(request.POST)
-
-        if student_form.is_valid() and parent_guardian_form.is_valid():
-            parent_guardian = parent_guardian_form.save()
-            student = student_form.save(commit=False)
-            student.parent_guardians = parent_guardian
-            student.save()
+        if student_form.is_valid():
+            student_form.save()
             return JsonResponse({'success': True})
         
-        errors = {
-            'errors': student_form.errors,
-            'parent_guardian_errors': parent_guardian_form.errors,
-        }
+        errors = {'errors': student_form.errors}
         return JsonResponse(errors, status=400)
 
     student_form = StudentForm()
-    parent_guardian_form = ParentGuardianForm()
+    parent_guardians = ParentGuardian.objects.all()
     return render(request, 'student/student_add_modal.html', {
         'student_form': student_form,
-        'parent_guardian_form': parent_guardian_form,
+        'parent_guardians': parent_guardians,
     })
-
 
 class StudentDeleteView(DeleteView):
     model = Student
@@ -530,3 +569,23 @@ def update_teacher(request, teacher_id):
         'teacher': teacher,
         'teacher_form': teacher_form,
     })
+
+
+@user_passes_test(is_superuser)
+@login_required
+def add_parent(request):
+    if request.method == 'POST':
+        form = ParentGuardianForm(request.POST)
+        if form.is_valid():
+            parent = form.save()
+            response = {
+                'success': True,
+                'parent_id': parent.id,
+                'parent_name': f"{parent.first_name} {parent.middle_name} {parent.last_name}"
+            }
+            return JsonResponse(response)
+        
+        errors = {'errors': form.errors}
+        return JsonResponse(errors, status=400)
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
