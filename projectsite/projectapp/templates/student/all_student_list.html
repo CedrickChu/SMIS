@@ -55,17 +55,38 @@
                                         <th>Grade Level</th>
                                         <th>School Year</th>
                                     </thead>
-                                    <tbody class="text-center">
+                                    <tbody>
                                         {% for student_info in student_infos %}
                                         <tr>
-                                            <td>{{ student_info.student.lrn }}</td>
-                                            <td>{{ student_info.student.first_name }} {{ student_info.student.middle_name }} {{ student_info.student.last_name }}</td>
-                                            <td >{{ student_info.grade_level }}</td>
-                                            <td>{{ student_info.school_year.year }}</td>
+                                            <td>
+                                                <div style="width:40%; margin:auto;">
+                                                    {{ student_info.student.lrn }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div style="width:50%; margin:auto;">
+                                                    {{ student_info.student.first_name }} {{ student_info.student.middle_name }} {{ student_info.student.last_name }}
+                                                </div>
+                                               </td>
+                                            <td >
+                                                <div style="width:30%; margin:auto;">
+                                                    {{ student_info.grade_level }}
+                                                </div>
+                                                
+                                            </td>
+                                            <td>
+                                                <div style="width:30%; margin:auto;">
+                                                    {{ student_info.school_year.year }}
+                                                </div>
+                                            </td>
+                                                
                                         </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
+                                <div>
+                                    {% include 'includes/pagination.html' %}
+                                </div>
                                 <script>
                                     function filterStudents() {
                                         document.getElementById("filter-form").submit();
@@ -83,6 +104,5 @@
 
 {% include 'student/studentinfo_add_modal.html' %}
 
-{% include 'student/student_add_modal.html' %}
 
 {% endblock %}
