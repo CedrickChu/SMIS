@@ -101,7 +101,7 @@ class GradeLevel(models.Model):
 
 class ParentGuardian(models.Model):
     first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100, null=True)
+    middle_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100)
     address = models.TextField(help_text='Full Address')
     contact_information = models.CharField(max_length=100, null=True)

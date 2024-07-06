@@ -104,14 +104,15 @@
                                 <div class="form-group">
                                     <label for="parent_guardians">Parent/Guardian</label>
                                     <div class="d-flex">
-                                        <select class="form-control mr-2" name="parent_guardians" style="height: 40px; width: 303px;" required>
+                                        <select class="form-control mr-2 js-selectize" name="parent_guardians" style="height: 40px; width: 303px;" required>
+                                            <option value="" disabled selected style="display:none;"> Enter Parent/Guardian </option>
                                             {% for parent_guardian in parent_guardians %}
                                                 <option value="{{ parent_guardian.id }}">{{ parent_guardian.first_name }} {{ parent_guardian.last_name }}</option>
                                             {% endfor %}
                                         </select>
                                         <button style="background-color:white;border: none;" class='read-more-info-icon' type="button" data-toggle="modal" data-target="#parentGuardianModal">
                                             <i class="fa fa-plus"></i>
-                                            <span class="hidden-info">Add Parent/Guardian </span>
+                                            <span class="hidden-info">Add Parent/Guardian</span>
                                         </button>
                                     </div>
                                 </div>
@@ -130,10 +131,17 @@
 
 {% include 'student/parent_add_modal.html' %}
 
+<!-- Selectize.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.bootstrap4.min.css">
+
+<!-- Selectize.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.min.js"></script>
+
 <script>
     $(document).ready(function() {
+
         $('#addStudentForm').submit(function(event) {
-            event.preventDefault(); 
+            event.preventDefault();
             var formData = $(this).serialize();
             $.ajax({
                 type: 'POST',
@@ -141,7 +149,7 @@
                 data: formData,
                 success: function(response) {
                     if (response.success) {
-                        window.location.href = "{% url 'student-list' %}";
+                        window.location.href = "{% url 'student-list' %}"; // redirect to student-list
                         alert('Student added successfully');
                         $('#addStudentModal').modal('hide');
                     } else {

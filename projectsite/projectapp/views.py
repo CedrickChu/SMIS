@@ -99,20 +99,22 @@ def logout_view(request):
 #     return render(request, 'account/verification_sent.html', {'message': message})
 
 
+
 @login_required
 def student_list(request):
     students = Student.objects.all()
     parent_guardians = ParentGuardian.objects.all()
     search_query = request.GET.get('search')
+    
     if search_query:
         students = students.filter(
             Q(first_name__icontains=search_query) |
             Q(last_name__icontains=search_query) |
-            Q(lrn__icontains=search_query)
+            Q(lrn__icontains=search_query) |
+            Q(parent_guardians__first_name__icontains=search_query) |  
+            Q(parent_guardians__last_name__icontains=search_query)
         )
-    print("Search Query:", search_query)
-    print("Students Count:", students.count())
-
+        
     context = {
         'students': students,
         'parent_guardians': parent_guardians

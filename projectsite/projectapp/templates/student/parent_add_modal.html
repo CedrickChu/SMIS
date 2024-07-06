@@ -19,19 +19,19 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="first_name">First Name:</label>
-                                    <input class="form-control" type="text" name="first_name" placeholder="Parent First Name" required>
+                                    <input class="form-control" type="text" name="first_name" id="first_name" placeholder="Parent First Name" required>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label for="middle_name">Middle Name:</label>
-                                    <input class="form-control" type="text" name="middle_name" placeholder="Parent Middle Name">
+                                    <input class="form-control" type="text" name="middle_name" id="middle_name" placeholder="Parent Middle Name">
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label for="last_name">Last Name:</label>
-                                    <input class="form-control" type="text" name="last_name" placeholder="Parent Last Name" required>
+                                    <input class="form-control" type="text" name="last_name" id="last_name" placeholder="Parent Last Name" required>
                                 </div>
                             </div>
                         </div>
@@ -39,13 +39,13 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="address">Address:</label>
-                                    <textarea class="form-control" name="address" rows="3" placeholder="Parent/Guardian Address" required></textarea>
+                                    <textarea class="form-control" name="address" id="address" rows="3" placeholder="Parent/Guardian Address" required></textarea>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label for="contact_information">Contact Information:</label>
-                                    <input class="form-control" type="text" name="contact_information" placeholder="Parent Contact Information" required>
+                                    <input class="form-control" type="text" name="contact_information" id="contact_information" placeholder="Parent Contact Information" required>
                                 </div>
                             </div>
                         </div>
@@ -59,25 +59,41 @@
         </div>
     </div>
 </div>
-
 <script>
     $(document).ready(function() {
+        var selectize = $('.js-selectize').selectize({
+            create: false, 
+        })[0].selectize;
+
+        // Supposedly the Function to capitalize first letter of a string, but not working, dont want to change anything, might crash lol. the function works on add student tho.
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
         $('#addParentForm').on('submit', function(e) {
             e.preventDefault();
+            
+            // Capitalize first name, middle name, and last name fields
+            $('#first_name').val(capitalizeFirstLetter($('#first_name').val()));
+            $('#middle_name').val(capitalizeFirstLetter($('#middle_name').val()));
+            $('#last_name').val(capitalizeFirstLetter($('#last_name').val()));
+            
             $.ajax({
                 type: 'POST',
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
                 success: function(response) {
                     if (response.success) {
-                        $('select[name="parent_guardians"]').append(
-                            $('<option>', {
-                                value: response.parent_id,
-                                text: response.parent_name,
-                                selected: true 
-                            })
-                        );
-                        $('#parentGuardianModal').modal('hide');
+                        
+                        // Add the new option using Selectize API
+                        selectize.addOption({ value: response.parent_id, text: response.parent_name });
+                        // Refresh options to display the new option
+                        selectize.refreshOptions(false); // Pass false to maintain the current selected option
+                        // Select the newly added option
+                        selectize.setValue(response.parent_id);
+                        alert('Parent added successfully'); // Success Message
+
+                        $('#parentGuardianModal').modal('hide'); // not hiding the modal. still on work
                     } else {
                         $('#parent-guardian-errors').html('');
                         $.each(response.errors, function(field, error) {
