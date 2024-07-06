@@ -11,10 +11,18 @@
         }
         .center {
             text-align: center;
-             
         }
         .center h4{
             margin-bottom: 4px;
+        }
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .header-container img {
+            height: 100px;
         }
         table {
             width: 100%;
@@ -28,9 +36,8 @@
         }
         th {
             background-color: #f2f2f2;
-            font-weight: 800; 
+            font-weight: 800;
         }
-    
         @media print {
             @page {
                 size: landscape;
@@ -41,9 +48,9 @@
             }
             table {
                 margin-bottom: 10px;
-                page-break-inside: auto; 
-                transform-origin: top left; 
-                width: 150vh; 
+                page-break-inside: auto;
+                transform-origin: top left;
+                width: 150vh;
                 margin-left: -50%;
                 margin-right: -50%;
                 position: absolute;
@@ -55,19 +62,23 @@
             }
             th {
                 background-color: #f2f2f2;
-                font-weight: 800; 
+                font-weight: 800;
             }
         }
-
     </style>
 </head>
 <body>
     <div class="center">
-        <h4>PALAWAN LITTLE ANGELS LEARNING SCHOOL</h4>
-        <p>{{ school.address }}</p>
-        <p>{{ school.contact_number }}</p>
-        <p>{{ grade_level }}</p>
-        <p>{{ school_year }}</p>
+        <div class="header-container">
+            <img src="../../static/images/logo.png" alt="Little Angel Logo">
+            <div>
+                <h4>PALAWAN LITTLE ANGELS LEARNING SCHOOL</h4>
+                <p>{{ school.address }}</p>
+                <p>{{ school.contact_number }}</p>
+                <p>{{ grade_level }}</p>
+                <p>{{ school_year }}</p>
+            </div>
+        </div>
     </div>
     <table>
         <thead>
@@ -89,8 +100,8 @@
                 <td>{{ student.first_name }} {{ student.last_name }}</td>
                 <td>{{ student.birth_date }}</td>
                 <td>{{ student.gender }}</td>
-                <td>5</td> 
-                <td>Mr & Mrs.{{ student.parent_guardians }}</td> 
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
                 <td>{{ student.address }}</td>
                 <td>{{ student.parent_guardians.contact_information }}</td>
             </tr>
