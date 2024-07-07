@@ -106,6 +106,10 @@ class ParentGuardian(models.Model):
     address = models.TextField(help_text='Full Address')
     contact_information = models.CharField(max_length=100, null=True)
 
+    def clean(self):
+        if self.middle_name is None:
+            self.middle_name = ""
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
@@ -118,10 +122,14 @@ class School(models.Model):
     
 class Teacher(models.Model):
     first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100, null=True)
+    middle_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100)
     address = models.TextField(help_text='Full Address')
     contact_information = models.CharField(max_length=100, null=True)
+
+    def clean(self):
+        if self.middle_name is None:
+            self.middle_name = ""
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -138,7 +146,7 @@ class Section(models.Model):
 class Student(models.Model):
     lrn = models.CharField(max_length=20, unique=True, help_text='Learner Reference Number', null=True)
     first_name = models.CharField(max_length=50)
-    middle_name = models.CharField(max_length=50, null=True)
+    middle_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50)
     birth_date = models.DateField()
     place_of_birth = models.TextField(help_text='Birth Address')
@@ -146,6 +154,10 @@ class Student(models.Model):
     address = models.TextField(help_text='Full Address')
     parent_guardians = models.ForeignKey(ParentGuardian,  on_delete=models.SET_NULL, null=True, help_text='List of Parents/Guardians')
     promoted = models.BooleanField(default=False)
+
+    def clean(self):
+        if self.middle_name is None:
+            self.middle_name = ""
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

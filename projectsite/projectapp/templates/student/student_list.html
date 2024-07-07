@@ -41,36 +41,49 @@
                                         <th>Parent/Guardian</th>
                                         <th>Action</th>
                                     </thead>
-                                    <tbody class="text-center">
+                                    <tbody>
                                         {% for student in students %}
                                         <tr>
-                                            <td>{{ student.lrn }}</td>
-                                            <td>{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</td>
-                                            <td>{{ student.parent_guardians.first_name }} {{ student.parent_guardians.middle_name }} {{ student.parent_guardians.last_name }}</td>
                                             <td>
-                                                <button class="btn btn-danger" style="margin-right: 20px;"
-                                                        data-toggle="modal"
-                                                        data-target="#studentModal{{ student.id }}"
-                                                        data-lrn="{{ student.lrn }}"
-                                                        data-name="{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}"
-                                                        data-gender="{{ student.gender }}"
-                                                        data-grade_level="{{ student.grade_level }}"
-                                                        data-birth_date="{{ student.birth_date }}"
-                                                        data-place_of_birth="{{ student.place_of_birth }}"
-                                                        data-address="{{ student.address }}"
-                                                        data-parent_guardian="{{ student.parent_guardians }}"
-                                                        data-parent_guardian_address="{{ student.parent_guardians.address }}"
-                                                        data-student_parent_guardian_contact="{{ student.parent_guardians.contact_information }}"
-                                                ><i class="fa fa-eye"></i>
-                                                    View Profile
-                                                </button>
-                                                {% if request.user.is_superuser %}
-                                                <button type="button" class="btn btn-warning" style="width:180px;">
-                                                    <a style='color:white;' href="{% url 'student-delete' student.pk %}">
-                                                        <i class="fa fa-trash"> Delete Student</i>
-                                                    </a>
-                                                </button>
-                                                {% endif %}
+                                                <div style="width:60%; margin:auto;">
+                                                    {{ student.lrn }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div style="width:70%; margin:auto;">
+                                                    {{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</td>
+                                                </div>
+                                            <td>
+                                                <div style="width:70%; margin:auto;">
+                                                    {{ student.parent_guardians.first_name }} {{ student.parent_guardians.middle_name }} {{ student.parent_guardians.last_name }}</td>
+                                                </div>
+                                            <td>
+                                                <div style="width:70%; margin:auto;">
+                                                    <button class="btn btn-danger" style="margin-right: 20px;"
+                                                            data-toggle="modal"
+                                                            data-target="#studentModal{{ student.id }}"
+                                                            data-lrn="{{ student.lrn }}"
+                                                            data-name="{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}"
+                                                            data-gender="{{ student.gender }}"
+                                                            data-grade_level="{{ student.grade_level }}"
+                                                            data-birth_date="{{ student.birth_date }}"
+                                                            data-place_of_birth="{{ student.place_of_birth }}"
+                                                            data-address="{{ student.address }}"
+                                                            data-parent_guardian="{{ student.parent_guardians }}"
+                                                            data-parent_guardian_address="{{ student.parent_guardians.address }}"
+                                                            data-student_parent_guardian_contact="{{ student.parent_guardians.contact_information }}"
+                                                    ><i class="fa fa-eye"></i>
+                                                        View Profile
+                                                    </button>
+                                                    {% if request.user.is_superuser %}
+                                                    <button type="button" class="btn btn-warning" style="width:180px;">
+                                                        <a style='color:white;' href="{% url 'student-delete' student.pk %}">
+                                                            <i class="fa fa-trash"> Delete Student</i>
+                                                        </a>
+                                                    </button>
+                                        
+                                                    {% endif %}
+                                                </div>
                                             </td>
                                         </tr>
                                         {% endfor %}
