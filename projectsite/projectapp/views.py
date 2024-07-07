@@ -21,6 +21,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db import transaction
+from datetime import date
 
 # def email_verification_required(request):
 #     return render(request, 'account/verified_email_required.html')
@@ -178,13 +179,31 @@ class PrintStudentListView(ListView):
     model = Student
     template_name = 'student/print_student.html'
     context_object_name = 'students'
-    paginate_by = 16 
+    paginate_by = 16
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        students = self.get_queryset()
+        # Calculate age for each student and store it in a dictionary
+        student_ages = []
+        for student in students:
+            birth_date = student.birth_date
+            age = self.calculate_age(birth_date)
+            student_ages.append({
+                'student': student,
+                'age': age
+            })
+        
+        context['student_ages'] = student_ages
         context['school'] = { 'address': 'Km.5 Tiniguiban Hi-Way, Puerto Princesa City', 'contact_number': 'Tel. # (048) 434 - 0041'}
-        context['grade_level'] = 'Grade Level'  
-        context['school_year'] = 'School Year'  
+        context['grade_level'] = 'Grade Level'
+        context['school_year'] = 'School Year'
         return context
+
+    def calculate_age(self, birth_date):
+        today = date.today()
+        age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+        return age
 
 @login_required
 def dashboard(request):

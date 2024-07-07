@@ -128,16 +128,16 @@
             </tr>
         </tfoot>
         <tbody>
-            {% for student in students %}
+            {% for item in student_ages %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ student.first_name }} {{ student.last_name }}</td>
-                <td>{{ student.birth_date }}</td>
-                <td>{{ student.gender }}</td>
-                <td>5</td>
-                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
-                <td>{{ student.address }}</td>
-                <td>{{ student.parent_guardians.contact_information }}</td>
+                <td>{{ item.student.first_name }} {{ item.student.last_name }}</td>
+                <td>{{ item.student.birth_date }}</td>
+                <td>{{ item.student.gender }}</td>
+                <td>{{ item.age }}</td>
+                <td>Mr & Mrs.{{ item.student.parent_guardians }}</td>
+                <td>{{ item.student.address }}</td>
+                <td>{{ item.student.parent_guardians.contact_information }}</td>
             </tr>
             {% endfor %}
             <tr>

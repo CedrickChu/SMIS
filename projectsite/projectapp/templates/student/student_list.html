@@ -31,7 +31,6 @@
                                         <button type="submit" class="input-group-text"><i class="nc-icon nc-zoom-split"></i></button>
                                     </div>
                                 </div>
-                               
                             </form>
                         </div>
                         <div class="card-body">
@@ -48,11 +47,11 @@
                                         <tr>
                                             <td>{{ student.lrn }}</td>
                                             <td>{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</td>
-                                            <td >{{ student.parent_guardians.first_name }} {{ student.parent_guardians.middle_name }} {{ student.parent_guardians.last_name }}</td>
+                                            <td>{{ student.parent_guardians.first_name }} {{ student.parent_guardians.middle_name }} {{ student.parent_guardians.last_name }}</td>
                                             <td>
                                                 <button class="btn btn-danger" style="margin-right: 20px;"
                                                         data-toggle="modal"
-                                                        data-target="#studentModal"
+                                                        data-target="#studentModal{{ student.id }}"
                                                         data-lrn="{{ student.lrn }}"
                                                         data-name="{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}"
                                                         data-gender="{{ student.gender }}"
@@ -61,17 +60,15 @@
                                                         data-place_of_birth="{{ student.place_of_birth }}"
                                                         data-address="{{ student.address }}"
                                                         data-parent_guardian="{{ student.parent_guardians }}"
-                                                        data-parent_guardian_address="{{ student.parent_guardians.address}}"
-                                                        data-student_parent_guardian_contact="{{ student.parent_guardians.contact_information}}"
+                                                        data-parent_guardian_address="{{ student.parent_guardians.address }}"
+                                                        data-student_parent_guardian_contact="{{ student.parent_guardians.contact_information }}"
                                                 ><i class="fa fa-eye"></i>
                                                     View Profile
                                                 </button>
                                                 {% if request.user.is_superuser %}
                                                 <button type="button" class="btn btn-warning" style="width:180px;">
-                                                    <a style='color:white;'href="{% url 'student-delete' student.pk %}">
-                                                        <i class="fa fa-trash">
-                                                          Delete Student
-                                                        </i>
+                                                    <a style='color:white;' href="{% url 'student-delete' student.pk %}">
+                                                        <i class="fa fa-trash"> Delete Student</i>
                                                     </a>
                                                 </button>
                                                 {% endif %}
@@ -84,12 +81,8 @@
                                     {% include 'includes/pagination.html' %}
                                 </div>
                                 <script>
-                                    function filterStudents() {
-                                        document.getElementById("filter-form").submit();
-                                    }
-
                                     $(document).ready(function() {
-                                        $('#studentModal').on('show.bs.modal', function(event) {
+                                        $('div[id^="studentModal"]').on('show.bs.modal', function(event) {
                                             var button = $(event.relatedTarget);
                                             var name = button.data('name');
                                             var lrn = button.data('lrn');
@@ -100,7 +93,7 @@
                                             var address = button.data('address');
                                             var parent_guardian = button.data('parent_guardian');
                                             var parent_guardian_address = button.data('parent_guardian_address');
-                                            var student_parent_guardian_contact = button.data('student_parent_guardian_contact')
+                                            var student_parent_guardian_contact = button.data('student_parent_guardian_contact');
 
                                             var modal = $(this);
                                             modal.find('.modal-title').text('Student Details');
@@ -113,7 +106,7 @@
                                             modal.find('#modal-student-address').text(address);
                                             modal.find('#modal-student-parent_guardian').text(parent_guardian);
                                             modal.find('#modal-student-parent_guardian_address').text(parent_guardian_address);
-                                            modal.find('#modal-student-parent_guardian_contact').text(student_parent_guardian_contact)
+                                            modal.find('#modal-student-parent_guardian_contact').text(student_parent_guardian_contact);
                                         });
                                     });
                                 </script>
