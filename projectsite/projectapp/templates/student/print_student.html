@@ -12,7 +12,7 @@
         .center {
             text-align: center;
         }
-        .center h4{
+        .center h4 {
             margin-bottom: 4px;
         }
         .header-container {
@@ -28,6 +28,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            margin-top: 23vh;
         }
         th, td {
             border: 1px solid black;
@@ -38,9 +39,19 @@
             background-color: #f2f2f2;
             font-weight: 800;
         }
+        .print-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 10px;
+            z-index: 1;
+        }
         @media print {
             @page {
                 size: landscape;
+                margin: 10mm;
             }
             body {
                 font-family: Arial, sans-serif;
@@ -48,13 +59,17 @@
             }
             table {
                 margin-bottom: 10px;
-                page-break-inside: auto;
-                transform-origin: top left;
-                width: 150vh;
-                margin-left: -50%;
-                margin-right: -50%;
-                position: absolute;
-                left: 50%;
+                page-break-after: auto;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+            tfoot {
+                display: table-footer-group;
+            }
+            tr {
+                page-break-inside: avoid;
             }
             th, td {
                 border: 1px solid black;
@@ -64,24 +79,38 @@
                 background-color: #f2f2f2;
                 font-weight: 800;
             }
+            .print-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+                padding: 10px;
+                z-index: 1;
+            }
+            .no-print {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="center">
-        <div class="header-container">
-            <img src="../../static/images/logo.png" alt="Little Angel Logo">
-            <div>
-                <h4>PALAWAN LITTLE ANGELS LEARNING SCHOOL</h4>
-                <p>{{ school.address }}</p>
-                <p>{{ school.contact_number }}</p>
-                <p>{{ grade_level }}</p>
-                <p>{{ school_year }}</p>
+    <header class="print-header">
+        <div class="center">
+            <div class="header-container">
+                <img src="../../static/images/logo.png" alt="Little Angel Logo">
+                <div>
+                    <h4>PALAWAN LITTLE ANGELS LEARNING SCHOOL</h4>
+                    <p>{{ school.address }}</p>
+                    <p>{{ school.contact_number }}</p>
+                    <p>{{ grade_level }}</p>
+                    <p>{{ school_year }}</p>
+                </div>
             </div>
         </div>
-    </div>
+    </header>
     <table>
-        <thead>
+        <thead class="display: table-header-group;">
             <tr>
                 <th style="width:30px;">No.</th>
                 <th style="width:350px;">Name</th>
@@ -93,6 +122,11 @@
                 <th style="width:350px;">Contact</th>
             </tr>
         </thead>
+        <tfoot>
+            <tr>
+                <td colspan="8">This is the table footer</td>
+            </tr>
+        </tfoot>
         <tbody>
             {% for student in students %}
             <tr>
@@ -106,14 +140,122 @@
                 <td>{{ student.parent_guardians.contact_information }}</td>
             </tr>
             {% endfor %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>5</td>
+                <td>Mr & Mrs.{{ student.parent_guardians }}</td>
+                <td></td>
+                <td></td>
+            </tr> 
+            <!-- Repeat above empty rows as needed -->
         </tbody>
     </table>
-    
-    <!-- Page break for print -->
-    <div style="page-break-before: always;"></div>
-    
-    <button onclick="window.print()">Print</button>
-    <button><a href="{% url 'student-list' %}" style="text-decoration:none; color:black;">Back</a></button>
-    
+
+
+    <button class="no-print" onclick="window.print()">Print</button>
+    <button class="no-print"><a href="{% url 'student-list' %}" style="text-decoration:none; color:black;">Back</a></button>
 </body>
 </html>

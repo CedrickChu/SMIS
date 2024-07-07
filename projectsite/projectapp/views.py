@@ -178,7 +178,7 @@ class PrintStudentListView(ListView):
     model = Student
     template_name = 'student/print_student.html'
     context_object_name = 'students'
-    paginate_by = 30  
+    paginate_by = 16 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['school'] = { 'address': 'Km.5 Tiniguiban Hi-Way, Puerto Princesa City', 'contact_number': 'Tel. # (048) 434 - 0041'}
