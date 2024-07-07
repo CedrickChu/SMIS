@@ -13,9 +13,8 @@
                     </button>
                     {% endif %}
                     <span id='returncode'></span>
-                    <button style="float:right" class="btn btn-info">
-                        <i class="glyphicon glyphicon-print"></i>
-                        <a href="{% url 'student-print' %}" style="text-decoration: none; color:white;">PRINT</a>
+                    <button style="float:right" class="btn btn-info" data-toggle="modal" data-target="#selectSchoolYearModal">
+                        <i class="glyphicon glyphicon-print"></i> PRINT
                     </button>
                 </h4>
             </div>
@@ -120,10 +119,11 @@
 </div>
 
 
-<!-- Student_details_Modal -->
+<!-- Ta-Modals -->
 {% include 'student/student_details_modal.html' %}
 
 {% include 'student/student_add_modal.html' %}
 
+{% include 'student/filter_print.html' %}
 
 {% endblock %}

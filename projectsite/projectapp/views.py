@@ -105,6 +105,8 @@ def logout_view(request):
 def student_list(request):
     students = Student.objects.all()
     parent_guardians = ParentGuardian.objects.all()
+    school_years = SchoolYear.objects.all()
+    grade_levels = GradeLevel.objects.all()
     search_query = request.GET.get('search')
     
     if search_query:
@@ -118,7 +120,9 @@ def student_list(request):
         
     context = {
         'students': students,
-        'parent_guardians': parent_guardians
+        'parent_guardians': parent_guardians,
+        'school_years': school_years,
+        'grade_levels': grade_levels
     }
     return render(request, 'student/student_list.html', context)
 
@@ -175,15 +179,33 @@ def add_generic_student(request):
         'student_form': student_form, 'students': students,
     })
 
+
 class PrintStudentListView(ListView):
     model = Student
     template_name = 'student/print_student.html'
     context_object_name = 'students'
     paginate_by = 16
 
+    def get_queryset(self):
+        queryset = Student.objects.all()
+        
+        # Filter by school year
+        school_year_id = self.request.GET.get('school_year')
+        if school_year_id:
+            student_infos = StudentInfo.objects.filter(school_year__id=school_year_id).values_list('student_id', flat=True)
+            queryset = queryset.filter(id__in=student_infos)
+        
+        # Filter by grade level
+        grade_level_id = self.request.GET.get('grade_level')
+        if grade_level_id:
+            queryset = queryset.filter(studentinfo__grade_level__id=grade_level_id)
+        
+        return queryset.distinct()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         students = self.get_queryset()
+        
         # Calculate age for each student and store it in a dictionary
         student_ages = []
         for student in students:
@@ -193,11 +215,27 @@ class PrintStudentListView(ListView):
                 'student': student,
                 'age': age
             })
+
+        # Fetch selected school year and grade level for display in context
+        school_year_id = self.request.GET.get('school_year')
+        if school_year_id:
+            school_year = get_object_or_404(SchoolYear, id=school_year_id)
+        else:
+            school_year = None
         
+        grade_level_id = self.request.GET.get('grade_level')
+        if grade_level_id:
+            grade_level = get_object_or_404(GradeLevel, id=grade_level_id)
+        else:
+            grade_level = None
+
+        # Populate context variables
         context['student_ages'] = student_ages
         context['school'] = { 'address': 'Km.5 Tiniguiban Hi-Way, Puerto Princesa City', 'contact_number': 'Tel. # (048) 434 - 0041'}
-        context['grade_level'] = 'Grade Level'
-        context['school_year'] = 'School Year'
+        context['school_year'] = school_year
+        context['grade_level_selected'] = grade_level
+        context['school_years'] = SchoolYear.objects.all()
+        context['grade_levels'] = GradeLevel.objects.all()
         return context
 
     def calculate_age(self, birth_date):
