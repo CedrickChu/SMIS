@@ -1,38 +1,38 @@
-<!-- Update Teacher Modal -->
-<div class="modal fade" id="updateTeacherModal" tabindex="-1" role="dialog" aria-labelledby="updateTeacherModalLabel" aria-hidden="true">
+<!-- Update parent Modal -->
+<div class="modal fade" id="updateParentModal" tabindex="-1" role="dialog" aria-labelledby="updateParentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="updateTeacherModalLabel">Update Teacher Information</h5>
+                <h5 class="modal-title" id="updateParentModalLabel">Update Teacher Information</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="updateTeacherForm" method="post" action="">               
+            <form id="updateParentForm" method="post" action="#">               
                 {% csrf_token %}
-                {{ teacher_form.as_p }}
+                {{ parent_form.as_p }}
                 <div class="modal-body">
                     <div id="update-form-errors" class="text-danger"></div>
-                    <h5>Teacher Information</h5>
+                    <h5>Parent Information</h5>
                     <hr style="height:2px; color:black; background-color: black;">
                     <div class="container" style="width:90%;">
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
                                     <label for="first_name">First Name</label>
-                                    <input class="form-control" type="text" name="first_name" value="{{ teacher.first_name }}"required>
+                                    <input class="form-control" type="text" name="first_name" value="{{ parent.first_name }}"required>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label for="middle_name">Middle Name</label>
-                                    <input class="form-control" type="text" name="middle_name" value="{{ teacher.middle_name }}">
+                                    <input class="form-control" type="text" name="middle_name" value="{{ parent.middle_name }}">
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label for="last_name">Last Name</label>
-                                    <input class="form-control" type="text" name="last_name" value="{{ teacher.last_name }}"  required>
+                                    <input class="form-control" type="text" name="last_name" value="{{ parent.last_name }}"  required>
                                 </div>
                             </div>
                         </div>
@@ -40,7 +40,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="contact_information">Contact Information</label>
-                                    <textarea class="form-control" name="contact_information" required>{{ teacher.contact_information }}</textarea>
+                                    <textarea class="form-control" name="contact_information" required>{{ parent.contact_information }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="submitUpdateTeacher">Update Teacher</button>
+                    <button type="submit" class="btn btn-primary" id="submitUpdateParent">Update Parent</button>
                 </div>
             </form>
         </div>
@@ -58,7 +58,7 @@
 <script>
     
    $(document).ready(function() {
-    $('#updateTeacherForm').submit(function(event) {
+    $('#updateParentForm').submit(function(event) {
         event.preventDefault();
         var formData = $(this).serialize();
         $.ajax({
@@ -70,8 +70,8 @@
             success: function(response) {
                 if (response.success) {
                     window.location.reload();
-                    alert('Teacher updated successfully');
-                    $('#updateTeacherModal').modal('hide');
+                    alert('parent updated successfully');
+                    $('#updateParentModal').modal('hide');
                 } else {
                     var errors = response.errors;
                     displayErrors(errors);

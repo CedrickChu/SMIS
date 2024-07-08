@@ -229,7 +229,6 @@ class PrintStudentListView(ListView):
         else:
             grade_level = None
 
-        # Populate context variables
         context['student_ages'] = student_ages
         context['school'] = { 'address': 'Km.5 Tiniguiban Hi-Way, Puerto Princesa City', 'contact_number': 'Tel. # (048) 434 - 0041'}
         context['school_year'] = school_year
@@ -648,3 +647,30 @@ def add_parent(request):
         return JsonResponse(errors, status=400)
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def parent_list(request):
+    parents = ParentGuardian.objects.all()
+    search_query = request.GET.get('search')
+    if search_query:
+        parents = parents.filter(
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query)
+        )
+       
+    context = {'parents' : parents}
+    return render(request, 'maintenance/parent_list.html', context)
+
+
+def update_parent(request, parent_id):
+    parent = get_object_or_404(ParentGuardian, id=parent_id)
+    if request.method == 'POST':
+        form = ParentGuardianForm(request.POST, instance=parent)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Parent edited successfully!')
+            return redirect('parent-list')
+    else:
+        form = ParentGuardianForm(instance=parent)
+        
+    return render(request, 'maintenance/parent_update_modal.html', {'form': form, 'parent': parent,})

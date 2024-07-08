@@ -149,7 +149,7 @@
                 data: formData,
                 success: function(response) {
                     if (response.success) {
-                        window.location.href = "{% url 'student-list' %}"; // redirect to student-list
+                        window.location.href = "{% url 'student-list' %}"; 
                         alert('Student added successfully');
                         $('#addStudentModal').modal('hide');
                     } else {
