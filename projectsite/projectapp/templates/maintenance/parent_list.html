@@ -7,7 +7,7 @@
         <div class="content">
             <div class="container" style="margin-top: 20px;">
                 <h4 class="card-title"> Parent List
-                    {% if request.user.is_superuser%}
+                    {% if request.user.is_superuser %}
                     <button style="float:right" type="button" class="btn btn-info" data-toggle="modal" data-target="#parentGuardianModal">
                         <i class="glyphicon glyphicon-plus"></i> New Entry
                     </button>
@@ -33,6 +33,7 @@
                                 <table class="table table-hover table-bordered">
                                     <thead class="text-primary text-center">
                                         <th>Name</th>
+                                        <th>Address</th>
                                         <th>Contact Information</th>
                                         {% if request.user.is_superuser %}
                                         <th>Action</th>
@@ -42,18 +43,13 @@
                                         {% for parent in parents %}
                                         <tr>
                                             <td>{{ parent.first_name }} {{ parent.middle_name }} {{ parent.last_name }}</td>
-                                            <td >{{ parent.contact_information }}</td>
+                                            <td>{{ parent.address }}</td>
+                                            <td>{{ parent.contact_information }}</td>
                                             <td>
                                                 {% if request.user.is_superuser %}
-                                                <button style="width:180px;" type="button" class="btn btn-danger" data-toggle="modal" data-target="#updateParentModal">
-                                                    <a style='color:white;'>
-                                                        <i class="fa fa-pen">
-                                                          Update
-                                                        </i>
-                                                    </a>
-                                                </button>
-                                               
-                                                <button type="button" class="btn btn-warning" style="width:180px; margin-left: 20px;">
+                                                <button class="btn btn-danger edit_parent" type="button" data-id="{{ parent.id }}" data-toggle="modal" data-target="#updateParentModal">
+                                                <i class="fa fa-pen"> Edit</i></button>
+                                                <button type="button" class="btn btn-warning delete_parent" data-id="{{ parent.id }}" style="width:180px; margin-left: 20px;">
                                                     <a style='color:white;' href="#">
                                                         <i class="fa fa-trash">
                                                           Delete
@@ -76,9 +72,45 @@
 </div>
 
 {% include 'maintenance/parent_add_modal.html' %}
-
-
 {% include 'maintenance/parent_update_modal.html' %}
 
+<script>
+    $('.edit_parent').click(function() {
+        const parentId = $(this).attr('data-id');
+        $.ajax({
+            url: `{% url 'parent-update' 0 %}`.replace('0', parentId),
+            method: 'GET',
+            success: function(data) {
+                $('#updateParentForm').attr('action', `{% url 'parent-update' 0 %}`.replace('0', parentId));
+                $('#updateParentForm input[name="first_name"]').val(data.first_name);
+                $('#updateParentForm input[name="middle_name"]').val(data.middle_name);
+                $('#updateParentForm input[name="last_name"]').val(data.last_name);
+                $('#updateParentForm textarea[name="address"]').val(data.address);
+                $('#updateParentForm textarea[name="contact_information"]').val(data.contact_information);
+            }
+        });
+    });
+
+    $('.delete_parent').click(function() {
+        const parentId = $(this).attr('data-id');
+        if(confirm("Are you sure to delete this Parent?")) {
+            $.ajax({
+                url: "#",
+                method: 'POST',
+                data: { 'id': parentId, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+                success: function(resp) {
+                    if (resp == 1) {
+                        alert("Data successfully deleted");
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        alert("Failed to delete data");
+                    }
+                }
+            });
+        }
+    });
+</script>
 
 {% endblock %}

@@ -142,8 +142,5 @@ class LogoutForm(forms.Form):
     pass
 
 
-
-
-
 class GradeLevelFilterForm(forms.Form):
     grade_level = forms.ModelChoiceField(queryset=GradeLevel.objects.all(), required=True, label='Grade Level')

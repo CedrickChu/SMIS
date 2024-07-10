@@ -71,11 +71,21 @@
                  
                     <div class="row">
                         <div class="col">
-                            <div class="form-group" style="width: 550px;">
-                                <label for="id_parent_guardians">Parent/Guardians:</label>
-                                {{ form.parent_guardians }}
+                            <div class="d-flex">
+                                <div class="form-group" style="width: 550px;">
+                                    <label for="id_parent_guardians">Parent/Guardians:</label>
+                                    {{ form.parent_guardians }}
+                                </div>
+
+                                <button style="background-color:white;border: none;" class='read-more-info-icon' type="button" data-id="{{ form.parent_guardians.id }}" data-toggle="modal" data-target="#updateParentModal">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="hidden-info">Update Parent/Guardian</span>
+                                </button>
                             </div>
+                            
                         </div>
+                        
+
                     </div>
                     <button type="button" class="btn btn-danger" id="btn_submit" data-toggle="modal" data-target="#confirmationModal">Update</button>
                     <a href="{% url 'student-list' %}" class="btn btn-secondary">Cancel</a>
@@ -84,6 +94,9 @@
         </div>
     </div>
 </div>
+
+{% include 'maintenance/parent_update_modal.html' %}
+
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -106,10 +119,30 @@
   </div>
 
   <script>
-   document.addEventListener('DOMContentLoaded', function() {
+    // Update parent/guardian modal content on click
+    $('#updateParentModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        var parentId = button.data('id');
+        $.ajax({
+            url: '{% url "parent-update" 0 %}'.replace('0', parentId),
+            method: 'GET',
+            success: function(data) {
+                $('#updateParentForm').attr('action', '{% url "parent-update" 0 %}'.replace('0', parentId));
+                $('#id_first_name').val(data.first_name);
+                $('#id_middle_name').val(data.middle_name);
+                $('#id_last_name').val(data.last_name);
+                $('#id_address').val(data.address);
+                $('#id_contact_information').val(data.contact_information);
+            }
+        });
+    });
+
+    // Submit form on confirmation
+    document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('confirmSubmitButton').addEventListener('click', function() {
             document.getElementById('student-update-form').submit();
         });
     });
-  </script>
+</script>
+  
 {% endblock %}

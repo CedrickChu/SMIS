@@ -134,7 +134,13 @@
                 <td>{{ item.student.first_name }} {{ item.student.last_name }}</td>
                 <td>{{ item.student.birth_date }}</td>
                 <td>{{ item.student.gender }}</td>
-                <td>{{ item.age }}</td>
+                <td>
+                    {% if item.age_years == 0 %}
+                        {{ item.age_months }} months, {{ item.age_days }} days
+                    {% else %}
+                        {{ item.age_years }} years
+                    {% endif %}
+                </td>
                 <td>Mr & Mrs.{{ item.student.parent_guardians }}</td>
                 <td>{{ item.student.address }}</td>
                 <td>{{ item.student.parent_guardians.contact_information }}</td>

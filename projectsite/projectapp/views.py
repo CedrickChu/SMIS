@@ -22,6 +22,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.db import transaction
 from datetime import date
+from django.views.decorators.http import require_http_methods
 
 # def email_verification_required(request):
 #     return render(request, 'account/verified_email_required.html')
@@ -129,6 +130,7 @@ def student_list(request):
 @login_required
 def allStudent_list(request):
     student_infos = StudentInfo.objects.all()
+    parent_guardians = ParentGuardian.objects.all()
     grade_level_filter = request.GET.get('grade_level')
     school_level_filter = request.GET.get('school_year')
     search_query = request.GET.get('search')
@@ -156,6 +158,7 @@ def allStudent_list(request):
         'school_years': school_years,
         'allStudents': allStudents,
         'sections': sections,
+        'parent_guardians': parent_guardians,
     }
     return render(request, 'student/all_student_list.html', context)
 
@@ -210,10 +213,22 @@ class PrintStudentListView(ListView):
         student_ages = []
         for student in students:
             birth_date = student.birth_date
-            age = self.calculate_age(birth_date)
+            age_years = self.calculate_age(birth_date)
+            
+            if age_years == 0:
+                today = date.today()
+                age_delta = today - birth_date
+                age_months = age_delta.days // 30
+                age_days = age_delta.days % 30
+            else:
+                age_months = None
+                age_days = None
+            
             student_ages.append({
                 'student': student,
-                'age': age
+                'age_years': age_years,
+                'age_months': age_months,
+                'age_days': age_days
             })
 
         # Fetch selected school year and grade level for display in context
@@ -662,15 +677,25 @@ def parent_list(request):
     return render(request, 'maintenance/parent_list.html', context)
 
 
-def update_parent(request, parent_id):
-    parent = get_object_or_404(ParentGuardian, id=parent_id)
+def update_parent(request, pk):
+    parent = get_object_or_404(ParentGuardian, pk=pk)
+
     if request.method == 'POST':
         form = ParentGuardianForm(request.POST, instance=parent)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Parent edited successfully!')
-            return redirect('parent-list')
+            return JsonResponse({'status': 1})  
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'status': 0, 'errors': errors})  
     else:
-        form = ParentGuardianForm(instance=parent)
-        
-    return render(request, 'maintenance/parent_update_modal.html', {'form': form, 'parent': parent,})
+        parent_data = {
+            'first_name': parent.first_name,
+            'middle_name': parent.middle_name,
+            'last_name': parent.last_name,
+            'address': parent.address,
+            'contact_information': parent.contact_information
+        }
+        return JsonResponse(parent_data)  
+
+

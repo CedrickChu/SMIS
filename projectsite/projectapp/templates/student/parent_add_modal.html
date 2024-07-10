@@ -65,14 +65,13 @@
             create: false, 
         })[0].selectize;
 
-        // Supposedly the Function to capitalize first letter of a string, but not working, dont want to change anything, might crash lol. the function works on add student tho.
+        // this Function supposedly be use to capitalize the first letter of a string(e.g first_name etc. etc.), but it's not working, dont want to change anything, might crash lol. the function works on add student tho.
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
         $('#addParentForm').on('submit', function(e) {
             e.preventDefault();
-            
             // Capitalize first name, middle name, and last name fields
             $('#first_name').val(capitalizeFirstLetter($('#first_name').val()));
             $('#middle_name').val(capitalizeFirstLetter($('#middle_name').val()));
@@ -94,6 +93,7 @@
                         alert('Parent added successfully'); // Success Message
 
                         $('#parentGuardianModal').modal('hide'); // not hiding the modal. still on work
+                        
                     } else {
                         $('#parent-guardian-errors').html('');
                         $.each(response.errors, function(field, error) {
