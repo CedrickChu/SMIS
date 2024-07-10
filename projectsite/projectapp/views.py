@@ -23,6 +23,11 @@ from django.views.decorators.http import require_POST
 from django.db import transaction
 from datetime import date
 from django.views.decorators.http import require_http_methods
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+
+from django.core.paginator import Paginator
+
 
 # def email_verification_required(request):
 #     return render(request, 'account/verified_email_required.html')
@@ -118,12 +123,19 @@ def student_list(request):
             Q(parent_guardians__first_name__icontains=search_query) |  
             Q(parent_guardians__last_name__icontains=search_query)
         )
-        
+    
+    paginator = Paginator(students, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'students': students,
+        'students': page_obj,
         'parent_guardians': parent_guardians,
         'school_years': school_years,
-        'grade_levels': grade_levels
+        'grade_levels': grade_levels,
+        'paginator': paginator,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
     }
     return render(request, 'student/student_list.html', context)
 
@@ -145,6 +157,11 @@ def allStudent_list(request):
             Q(student__last_name__icontains=search_query) |
             Q(student__lrn__icontains=search_query)
         )
+
+    paginator = Paginator(student_infos, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     grade_levels = GradeLevel.objects.all()
     school_years = SchoolYear.objects.all()
     students = [info.student for info in student_infos]
@@ -152,13 +169,15 @@ def allStudent_list(request):
     sections = Section.objects.all()
     
     context = {
-        'student_infos': student_infos,
+        'student_infos': page_obj,
         'grade_levels': grade_levels,
         'students': students,
         'school_years': school_years,
         'allStudents': allStudents,
         'sections': sections,
         'parent_guardians': parent_guardians,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
     }
     return render(request, 'student/all_student_list.html', context)
 
@@ -598,8 +617,14 @@ def teacher_list(request):
             Q(first_name__icontains=search_query) |
             Q(last_name__icontains=search_query) 
         )
+    paginator = Paginator(teachers, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'teachers': teachers,
+        'teachers': page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
     }
     return render(request, 'maintenance/teacher_list.html', context)
 
@@ -622,26 +647,28 @@ def add_teacher(request):
         'teacher_form': teacher_form,
     })
 
+
 @user_passes_test(is_superuser)
 @login_required
-def update_teacher(request, teacher_id):
-    teacher = get_object_or_404(Teacher, id=teacher_id)
+def update_teacher(request, pk):
+    teacher = get_object_or_404(Teacher, pk=pk)
     if request.method == 'POST':
         teacher_form = TeacherForm(request.POST, instance=teacher)
         if teacher_form.is_valid():
             teacher_form.save()
-            return JsonResponse({'success': True})
+            return JsonResponse({'status': 1})  
         else:
-            errors = {
-                'errors': teacher_form.errors,
-            }
-            return JsonResponse(errors, status=400)
-
-    teacher_form = TeacherForm(instance=teacher)
-    return render(request, 'maintenance/teacher_update_modal.html', {
-        'teacher': teacher,
-        'teacher_form': teacher_form,
-    })
+            errors = teacher_form.errors.as_json()
+            return JsonResponse({'status': 0, 'errors': errors})  
+    else:
+        teacher_data = {
+            'first_name': teacher.first_name,
+            'middle_name': teacher.middle_name,
+            'last_name': teacher.last_name,
+            'address': teacher.address,
+            'contact_information': teacher.contact_information
+        }
+        return JsonResponse(teacher_data)  
 
 
 @user_passes_test(is_superuser)
@@ -672,8 +699,16 @@ def parent_list(request):
             Q(first_name__icontains=search_query) |
             Q(last_name__icontains=search_query)
         )
+    paginator = Paginator(parents, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
        
-    context = {'parents' : parents}
+    context = {
+        'parents' : page_obj,
+        'page_obj': page_obj,
+        'is_paginated': page_obj.has_other_pages(),
+
+        }
     return render(request, 'maintenance/parent_list.html', context)
 
 
@@ -697,5 +732,22 @@ def update_parent(request, pk):
             'contact_information': parent.contact_information
         }
         return JsonResponse(parent_data)  
+    
+@csrf_exempt
+def delete_parent(request):
+    if request.method == 'POST' and request.user.is_superuser:
+        parent_id = request.POST.get('id')
+        parent = get_object_or_404(ParentGuardian, id=parent_id)
+        parent.delete()
+        return JsonResponse(1, safe=False) 
+    return JsonResponse(0, safe=False) 
 
+@csrf_exempt
+def delete_teacher(request):
+    if request.method == 'POST' and request.user.is_superuser:
+        teacher_id = request.POST.get('id')
+        teacher = get_object_or_404(Teacher, id=teacher_id)
+        teacher.delete()
+        return JsonResponse(1, safe=False) 
+    return JsonResponse(0, safe=False) 
 

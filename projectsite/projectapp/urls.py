@@ -32,10 +32,13 @@ urlpatterns = [
     path('section/<int:pk>/update/', views.update_section, name='section-update'),
     path('teacher/', views.teacher_list, name='teacher-list'),
     path('teacher/add', views.add_teacher, name='teacher-add'),
-    path('teacher/<int:id>/update/', views.update_teacher, name='teacher-update'),
+    path('teacher/<int:pk>/update/', views.update_teacher, name='teacher-update'),
     path('allStudent/', views.allStudent_list, name='allStudent-list'),
     path('student/generic/add', views.add_generic_student, name='allStudent-add'),
     path('student/parent/add', views.add_parent, name='parent-add'),
     path('parent/', views.parent_list, name='parent-list'),
     path('parent/update/<int:pk>/', views.update_parent, name='parent-update'),
+    path('parentguardian/delete/', views.delete_parent, name='parent-delete'),
+    path('teacher/delete/', views.delete_teacher, name='teacher-delete'),
+
 ]

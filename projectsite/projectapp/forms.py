@@ -130,7 +130,14 @@ class SectionForm(forms.ModelForm):
 class TeacherForm(forms.ModelForm):
     class Meta:
         model = Teacher
-        fields = '__all__'   
+        fields = '__all__'
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'middle_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.Textarea(attrs={'class': 'form-control'}),
+            'contact_information': forms.Textarea(attrs={'class': 'form-control'}),
+        }
    
 
 class StudentInfoForm(forms.ModelForm):

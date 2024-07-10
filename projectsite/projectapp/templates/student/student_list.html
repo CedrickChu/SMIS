@@ -51,14 +51,16 @@
                                             </td>
                                             <td>
                                                 <div style="width:70%; margin:auto;">
-                                                    {{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</td>
+                                                    {{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}
                                                 </div>
+                                            </td>
                                             <td>
                                                 <div style="width:70%; margin:auto;">
-                                                    {{ student.parent_guardians.first_name }} {{ student.parent_guardians.middle_name }} {{ student.parent_guardians.last_name }}</td>
+                                                    {{ student.parent_guardians.first_name }} {{ student.parent_guardians.middle_name }} {{ student.parent_guardians.last_name }}
                                                 </div>
-                                            <td>
-                                                <div style="width:70%; margin:auto;">
+                                            </td>
+                                            <td class="text-center">
+                                                <div>
                                                     <button class="btn btn-danger" style="margin-right: 20px;"
                                                             data-toggle="modal"
                                                             data-target="#studentModal{{ student.id }}"
@@ -76,9 +78,9 @@
                                                         View Profile
                                                     </button>
                                                     {% if request.user.is_superuser %}
-                                                    <button type="button" class="btn btn-warning" style="width:180px;">
+                                                    <button type="button" class="btn btn-warning">
                                                         <a style='color:white;' href="{% url 'student-delete' student.pk %}">
-                                                            <i class="fa fa-trash"> Delete Student</i>
+                                                            <i class="fa fa-trash"> Delete</i>
                                                         </a>
                                                     </button>
                                         
@@ -130,7 +132,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- Ta-Modals -->
 {% include 'student/student_details_modal.html' %}

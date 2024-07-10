@@ -164,13 +164,13 @@ class Student(models.Model):
     
 class StudentInfo(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    school_year = models.ForeignKey(SchoolYear, on_delete=models.SET_NULL, null=True)
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
-    grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE)
+    grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name

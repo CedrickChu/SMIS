@@ -33,6 +33,7 @@
                                 <table class="table table-hover table-bordered">
                                     <thead class="text-primary text-center">
                                         <th>Name</th>
+                                        <th>Address</th>
                                         <th>Contact Information</th>
                                         {% if request.user.is_superuser %}
                                         <th>Action</th>
@@ -43,9 +44,10 @@
                                         <tr>
                                             <td>{{ teacher.first_name }} {{ teacher.middle_name }} {{ teacher.last_name }}</td>
                                             <td >{{ teacher.contact_information }}</td>
+                                            <td>{{ teacher.address }}</td>
                                             <td>
                                                 {% if request.user.is_superuser %}
-                                                <button style="width:180px;" type="button" class="btn btn-danger" data-toggle="modal" data-target="#updateTeacherModal">
+                                                <button class="btn btn-danger edit_teacher" type="button" data-id="{{ teacher.id }}" data-toggle="modal" data-target="#updateTeacherModal">
                                                     <a style='color:white;'>
                                                         <i class="fa fa-pen">
                                                           Update
@@ -53,7 +55,7 @@
                                                     </a>
                                                 </button>
                                                
-                                                <button type="button" class="btn btn-warning" style="width:180px; margin-left: 20px;">
+                                                <button class="btn btn-warning delete_teacher" type="button" data-id="{{ teacher.id }}">
                                                     <a style='color:white;' href="#">
                                                         <i class="fa fa-trash">
                                                           Delete
@@ -66,6 +68,9 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
+                                <div>
+                                    {% include 'includes/pagination.html' %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -77,6 +82,48 @@
 {% include 'maintenance/teacher_add_modal.html' %}
 
 {% include 'maintenance/teacher_update_modal.html' %}
+
+
+
+
+<script>
+    $('.edit_teacher').click(function() {
+        const teacherId = $(this).attr('data-id');
+        $.ajax({
+            url: `{% url 'teacher-update' 0 %}`.replace('0', teacherId),
+            method: 'GET',
+            success: function(data) {
+                $('#updateTeacherForm').attr('action', `{% url 'teacher-update' 0 %}`.replace('0', teacherId));
+                $('#updateTeacherForm input[name="first_name"]').val(data.first_name);
+                $('#updateTeacherForm input[name="middle_name"]').val(data.middle_name);
+                $('#updateTeacherForm input[name="last_name"]').val(data.last_name);
+                $('#updateTeacherForm textarea[name="address"]').val(data.address);
+                $('#updateTeacherForm textarea[name="contact_information"]').val(data.contact_information);
+            }
+        });
+    });
+
+    $('.delete_teacher').click(function() {
+        const parentId = $(this).attr('data-id');
+        if(confirm("Are you sure to delete this Teacher?")) {
+            $.ajax({
+                url: "{% url 'teacher-delete' %}",
+                method: 'POST',
+                data: { 'id': parentId, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+                success: function(resp) {
+                    if (resp == 1) {
+                        alert("Data successfully deleted");
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        alert("Failed to delete data");
+                    }
+                }
+            });
+        }
+    });
+</script>
 
 
 {% endblock %}
