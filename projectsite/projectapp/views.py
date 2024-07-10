@@ -307,20 +307,20 @@ def student_update(request, student_id):
 @login_required
 def add_student(request):
     if request.method == 'POST':
-        student_form = StudentForm(request.POST)
+        student_form = ParentGuardianForm(request.POST)
         if student_form.is_valid():
-            student_form.save()
-            return JsonResponse({'success': True})
+            student = student_form.save()
+            response = {
+                'success': True,
+                'student_id': student.id,
+                'student_name': f"{student.first_name} {student.middle_name} {student.last_name}"
+            }
+            return JsonResponse(response)
         
         errors = {'errors': student_form.errors}
         return JsonResponse(errors, status=400)
-
-    student_form = StudentForm()
-    parent_guardians = ParentGuardian.objects.all()
-    return render(request, 'student/student_add_modal.html', {
-        'student_form': student_form,
-        'parent_guardians': parent_guardians,
-    })
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 class StudentDeleteView(DeleteView):
     model = Student

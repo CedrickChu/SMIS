@@ -62,18 +62,46 @@
 
 <script>
     $(document).ready(function() {
+        var selectizeElement = $('.js-selectize');
+        var selectizeInstance;
+
+        if (selectizeElement.length) {
+            selectizeInstance = selectizeElement.selectize({
+                create: false
+            })[0].selectize;
+        }
+
         $('#addParentForm').submit(function(event) {
-            event.preventDefault(); 
+            event.preventDefault();
             var formData = $(this).serialize();
+
             $.ajax({
                 type: 'POST',
                 url: $(this).attr('action'),
                 data: formData,
                 success: function(response) {
                     if (response.success) {
-                        window.location.href = "{% url 'parent-list' %}";
+                        // Get current URL path
+                        var currentUrlPath = window.location.pathname;
+
+                        var parentListPath = '/parent/';
+                        var studentListPath = '/student/';
+                        var allStudentListPath = '/allStudent/'; // Add leading slash
+
+                        // If the current path is /parent/, just reload after adding parent
+                        if (currentUrlPath === parentListPath) {
+                            // Reload the current page if on parent list
+                            window.location.href = parentListPath;
+                        } else if ((currentUrlPath === studentListPath && selectizeInstance) || 
+                                (currentUrlPath === allStudentListPath && selectizeInstance)) {
+                            // Else if current path is /student/ or /allStudent/, populate the selectize option with the new parent
+                            selectizeInstance.addOption({ value: response.parent_id, text: response.parent_name });
+                            selectizeInstance.refreshOptions(false);
+                            selectizeInstance.setValue(response.parent_id);
+                        }
+
                         alert('Parent added successfully');
-                        $('#addParentModal').modal('hide'); 
+                        $('#parentGuardianModal').modal('hide'); 
                     } else {
                         console.error('Unexpected response:', response);
                     }
@@ -81,14 +109,13 @@
                 error: function(xhr, status, error) {
                     console.error('AJAX Error:', error);
                     var errors = xhr.responseJSON.errors;
-
-                    $('#form-errors').html('');
+                    $('#parent-guardian-errors').html(''); 
                     if (errors) {
                         $.each(errors, function(field, errors) {
-                            $('#form-errors').append('<p>' + field + ': ' + errors.join(', ') + '</p>');
+                            $('#parent-guardian-errors').append('<p>' + field + ': ' + errors.join(', ') + '</p>');
                         });
                     }
-                    $('#form-errors').show();
+                    $('#parent-guardian-errors').show();
                 }
             });
         });

@@ -78,13 +78,18 @@
                 console.log(response);
                 if (response.status === 1) {
                     alert('Successfully updated data');
-                    window.location.href = "{% url 'parent-list' %}";
+                    location.reload();
+
+                    $(".modal").modal("hide");
+                    $(".modal-backdrop").remove();
                 } else {
                     $('#msg').html('<div class="alert alert-danger mx-2">Failed to update data.</div>');
+                    $(".modal-fade").modal("hide");
+                    $(".modal-backdrop").remove();
                 }
             },
             error: function(xhr, status, error) {
-                console.error(xhr.responseText);
+                console.error(xhr.responseText); 
                 $('#msg').html('<div class="alert alert-danger mx-2">Error: ' + error + '</div>');
             }
         });
