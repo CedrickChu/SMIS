@@ -307,7 +307,7 @@ def student_update(request, student_id):
 @login_required
 def add_student(request):
     if request.method == 'POST':
-        student_form = ParentGuardianForm(request.POST)
+        student_form = StudentForm(request.POST)
         if student_form.is_valid():
             student = student_form.save()
             response = {

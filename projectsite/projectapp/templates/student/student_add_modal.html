@@ -104,7 +104,7 @@
                                 <div class="form-group">
                                     <label for="parent_guardians">Parent/Guardian</label>
                                     <div class="d-flex">
-                                        <select class="form-control mr-2 js-selectize" name="parent_guardians" style="height: 40px; width: 303px;" required>
+                                        <select class="form-control mr-2 js-selectize-parent" name="parent_guardians" style="height: 40px; width: 303px;" required>
                                             <option value="" disabled selected style="display:none;"> Enter Parent/Guardian </option>
                                             {% for parent_guardian in parent_guardians %}
                                                 <option value="{{ parent_guardian.id }}">{{ parent_guardian.first_name }} {{ parent_guardian.last_name }}</option>
@@ -131,15 +131,18 @@
 
 {% include 'maintenance/parent_add_modal.html' %}
 
-<!-- Selectize.js CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.bootstrap4.min.css">
-
-<!-- Selectize.js JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.min.js"></script>
-
 <script>
     $(document).ready(function() {
-
+        // Initialize Selectize for Student Modal
+        var selectizeStudentElement = $('.js-selectize-student');
+        var selectizeStudentInstance;
+    
+        if (selectizeStudentElement.length) {
+            selectizeStudentInstance = selectizeStudentElement.selectize({
+                create: false
+            })[0].selectize;
+        }
+    
         $('#addStudentForm').submit(function(event) {
             event.preventDefault();
             var formData = $(this).serialize();
@@ -149,9 +152,27 @@
                 data: formData,
                 success: function(response) {
                     if (response.success) {
-                        window.location.href = "{% url 'student-list' %}"; 
+                        var currentUrlPath = window.location.pathname;
+    
+                        var studentListPath = '/student/';
+                        var allStudentListPath = '/allStudent/';
+    
+                        // Close the modal based on current path
+                        if (currentUrlPath === studentListPath) {
+                            // Redirect to student list page
+                            window.location.href = studentListPath;
+                        } else if (currentUrlPath === allStudentListPath) {
+                            // Update selectize and close modal
+                            if (selectizeStudentInstance) {
+                                selectizeStudentInstance.addOption({ value: response.student_id, text: response.student_name });
+                                selectizeStudentInstance.refreshOptions(false);
+                                selectizeStudentInstance.setValue(response.student_id);
+                            }
+                            $('#addStudentModal').modal('hide');
+                        }
+    
+                        // Optionally, show a success message
                         alert('Student added successfully');
-                        $('#addStudentModal').modal('hide');
                     } else {
                         $('#add-student-errors').html('');
                         $.each(response.errors, function(field, error) {
@@ -173,4 +194,4 @@
             });
         });
     });
-</script>
+    </script>

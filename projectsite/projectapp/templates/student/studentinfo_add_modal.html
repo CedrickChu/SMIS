@@ -19,7 +19,7 @@
                             <div class="form-group">
                                 <label for="student">Select Existing Student: </label>
                                 <div class="d-flex">
-                                    <select style='height:40px; width:40%;' class="form-control mr-2 js-selectize" name="student" required>
+                                    <select style='height:40px; width:40%;' class="form-control mr-2 js-selectize-student" name="student" required>
                                         <option value="" disabled selected style="display:none;"> Enter Student </option>
                                         {% for student in allStudents %}
                                             <option value="{{ student.id }}">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</option>
