@@ -146,11 +146,11 @@ def allStudent_list(request):
     grade_level_filter = request.GET.get('grade_level')
     school_level_filter = request.GET.get('school_year')
     search_query = request.GET.get('search')
+
     if grade_level_filter:
         student_infos = student_infos.filter(grade_level_id=grade_level_filter)
     if school_level_filter:
         student_infos = student_infos.filter(school_year_id=school_level_filter)
-
     if search_query:
         student_infos = student_infos.filter(
             Q(student__first_name__icontains=search_query) |

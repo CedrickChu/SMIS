@@ -32,17 +32,17 @@
                                         <option value="{{ level.id }}" {% if request.GET.grade_level == level.id|stringformat:'s' %} selected {% endif %}>{{ level.name }}</option>
                                         {% endfor %}
                                     </select>
-                                </div >
+                                </div>
                                 <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
-                                    <select name="grade_level" class="form-control" style="height:40px;">
+                                    <select name="school_year" class="form-control" style="height:40px;">
                                         <option value="">Select School Year (Default All)</option>
                                         {% for year in school_years %}
-                                        <option value="{{ year.id }}" {% if request.GET.school_year == 1 %} selected {% endif %}>{{ year.year }}</option>
+                                        <option value="{{ year.id }}" {% if request.GET.school_year == year.id|stringformat:'s' %} selected {% endif %}>{{ year.year }}</option>
                                         {% endfor %}
                                     </select>
-                                </div >
-                                <div style="float: right; margin-right: 10px;margin-top:-10px;" >
-                                    <button style='height:40px;' type="button" class="btn btn-primary" onclick="filterStudents()">Filter</button>
+                                </div>
+                                <div style="float: right; margin-right: 10px; margin-top: -10px;">
+                                    <button style="height: 40px;" type="button" class="btn btn-primary" onclick="filterStudents()">Filter</button>
                                 </div>
                             </form>
                         </div>
@@ -59,27 +59,25 @@
                                         {% for student_info in student_infos %}
                                         <tr>
                                             <td>
-                                                <div style="width:40%; margin:auto;">
+                                                <div style="width: 40%; margin: auto;">
                                                     {{ student_info.student.lrn }}
                                                 </div>
                                             </td>
                                             <td>
-                                                <div style="width:50%; margin:auto;">
+                                                <div style="width: 50%; margin: auto;">
                                                     {{ student_info.student.first_name }} {{ student_info.student.middle_name }} {{ student_info.student.last_name }}
                                                 </div>
-                                               </td>
-                                            <td >
-                                                <div style="width:30%; margin:auto;">
-                                                    {{ student_info.grade_level }}
-                                                </div>
-                                                
                                             </td>
                                             <td>
-                                                <div style="width:30%; margin:auto;">
+                                                <div style="width: 30%; margin: auto;">
+                                                    {{ student_info.grade_level }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div style="width: 30%; margin: auto;">
                                                     {{ student_info.school_year.year }}
                                                 </div>
                                             </td>
-                                                
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -101,8 +99,6 @@
     </div>
 </div>
 
-
 {% include 'student/studentinfo_add_modal.html' %}
-
 
 {% endblock %}
