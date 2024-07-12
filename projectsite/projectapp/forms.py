@@ -73,9 +73,18 @@ class SubjectForm(forms.ModelForm):
         self.fields['grade_level'].label = 'Grade Level'  
 
 class SchoolYearForm(forms.ModelForm):
+    STATUS_CHOICES = (
+        (True, 'Active'),
+        (False, 'Inactive'),
+    )
+
+    status = forms.ChoiceField(choices=STATUS_CHOICES)
+
     class Meta:
         model = SchoolYear
-        fields = ['year', 'start_date', 'end_date']
+        fields = ['year', 'start_date', 'end_date', 'status']
+
+
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),

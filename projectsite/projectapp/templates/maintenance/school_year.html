@@ -19,7 +19,8 @@
                                         <th style="width:20%">School Year</th>
                                         <th>Start Date</th>
                                         <th>End Date</th>
-                                        {% if request.user.is_superuser   %}
+                                        <th>Status</th>
+                                        {% if request.user.is_superuser %}
                                         <th style="width:10%">Action</th>
                                         {% endif %}
                                     </tr>
@@ -37,8 +38,7 @@
                                             <input id="year-end-date-{{ year.id }}" type="date" style="border:0px" value="{{ year.end_date|date:'Y-m-d' }}" readonly>
                                         </td>
                                         <td>
-                                            <input id="year-status-{{ year.id }}" type="text" style="border:0px" value="{% if year.status %}Current{% else %}Inactive{% endif %}" readonly>
-
+                                            <input id="year-status-{{ year.id }}" type="text" style="border:0px" value="{% if year.status %}Active{% else %}Inactive{% endif %}" readonly>
                                         </td>
                                         {% if request.user.is_superuser %}
                                         <td>
@@ -110,11 +110,13 @@
                                         <div class="cols-sm-4">
                                             <div class="input-group">
                                                 <span class="input-group-addon"></span>
-                                                <input type="text" class="form-control" id="status" name="status" style="width:200px" value="{% if year.status %}Current{% else %}Inactive{% endif %}"" required>
+                                                <select class="form-control" id="status" name="status" style="width:200px; height: 40px;" required>
+                                                    <option value="True" {% if school_year_form.status.value == 'True' %}selected{% endif %}>Active</option>
+                                                    <option value="False" {% if school_year_form.status.value == 'False' %}selected{% endif %}>Inactive</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="status"></div>
                                     <div class="form-group">
                                         <input type="button" class="btn btn-info" id="reset" name="reset" value="Cancel" onclick="resetForm()">
                                         <button type="button" class="btn btn-info" id="btn_submit" data-toggle="modal" data-target="#confirmationModal">{{ submit_label }}</button>
@@ -125,9 +127,7 @@
                     </div>
                 </div>
                 {% endif %}
-               
             </div>
-           
         </div>
     </div>
 </div>
@@ -151,20 +151,20 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
 
 <script>
     function editYear(yearId) {
         var yearName = document.getElementById('year-name-' + yearId).value;
         var startDate = document.getElementById('year-start-date-' + yearId).value;
         var endDate = document.getElementById('year-end-date-' + yearId).value;
-        var status = document.getElementById('year-status-' + yearId).value;
+        var status = document.getElementById('year-status-' + yearId).value === 'Active';
         document.getElementById('year-form').action = "{% url 'year-update' pk=0 %}".replace('0', yearId);
         document.getElementById('id').value = yearId;
         document.getElementById('year').value = yearName;
         document.getElementById('start_date').value = startDate;
         document.getElementById('end_date').value = endDate;
-        document.getElementById('status').value = status;
+        document.getElementById('status').value = status ? 'True' : 'False';
         document.getElementById('head').innerText = 'Edit Year';
         document.getElementById('btn_submit').innerText = 'Update Year';
     }
@@ -179,11 +179,11 @@
         document.getElementById('head').innerText = '{{ form_title }}';
         document.getElementById('btn_submit').innerText = '{{ submit_label }}';
     }
+
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('confirmSubmitButton').addEventListener('click', function() {
             document.getElementById('year-form').submit();
         });
     });
-
 </script>
 {% endblock %}
