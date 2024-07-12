@@ -1,47 +1,48 @@
 # forms.py
 from django import forms
-from .models import User, UserProfile, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section, Teacher, StudentInfo
-from django.contrib.auth.forms import UserCreationForm
+from .models import User, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section, Teacher, StudentInfo
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.core.exceptions import ValidationError
 
 
-class CustomUserCreationForm(UserCreationForm):
+
+class UserRegistrationForm(forms.ModelForm):
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput, required=False)
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput, required=False)
+
     class Meta:
         model = User
-        fields = ['email', 'username', 'phone', 'password1', 'password2']
+        fields = ('username', 'first_name', 'last_name', 'is_superuser', 'is_staff', 'is_active')
 
     def __init__(self, *args, **kwargs):
-        super(CustomUserCreationForm, self).__init__(*args, **kwargs)
-        self.fields['email'].widget.attrs.update({'class': 'form-control'})
-        self.fields['username'].widget.attrs.update({'class': 'form-control'})
-        self.fields['phone'].widget.attrs.update({'class': 'form-control'})
-        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
-        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
+        self.exclude_user = kwargs.pop('exclude_user', None)
+        super(UserRegistrationForm, self).__init__(*args, **kwargs)
 
-class UserAndProfileForm(forms.ModelForm):
-    username = forms.CharField(max_length=150, required=True)
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(max_length=30, required=False)
-    last_name = forms.CharField(max_length=30, required=False)
-    address = forms.CharField(max_length=255, required=False)
-    city = forms.CharField(max_length=100, required=False)
-    country = forms.CharField(max_length=100, required=False)
-    postal_code = forms.CharField(max_length=20, required=False)
-    about_me = forms.CharField(widget=forms.Textarea, required=False)
-    profile_image = forms.ImageField(required=False)
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if self.exclude_user and self.instance and self.instance.username == username:
+            return username 
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("This username is already taken.")
+        return username
 
-    class Meta:
-        model = UserProfile
-        fields = ['first_name', 'last_name', 'address', 'city', 'country', 'postal_code', 'about_me', 'profile_image']
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords do not match.")
+        return password2
 
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ['first_name', 'last_name']
+    def save(self, commit=True):
+        user = super(UserRegistrationForm, self).save(commit=False)
+        password1 = self.cleaned_data.get('password1')
+        if password1:
+            user.set_password(password1)
+        if commit:
+            user.save()
+        return user
 
-    def __init__(self, *args, **kwargs):
-        super(UserProfileForm, self).__init__(*args, **kwargs)
-        self.fields['first_name'].widget.attrs.update({'class': 'form-control'})
-        self.fields['last_name'].widget.attrs.update({'class': 'form-control'})
+
 
 class StudentForm(forms.ModelForm):
     class Meta:
@@ -101,25 +102,6 @@ class ParentGuardianForm(forms.ModelForm):
             'address': forms.Textarea(attrs={'class': 'form-control'}),
             'contact_information': forms.Textarea(attrs={'class': 'form-control'}),
         }
-
-
-class CombinedForm(forms.Form):
-    student = StudentForm()
-    parent_guardian = ParentGuardianForm()
-
-    def is_valid(self):
-        return self.student.is_valid() and self.parent_guardian.is_valid()
-
-    def save(self, commit=True):
-        student = self.student.save(commit=False)
-        parent_guardian = self.parent_guardian.save(commit=False)
-        
-        if commit:
-            parent_guardian.save()
-            student.parent_guardians = parent_guardian
-            student.save()
-        return student
-
 
 class GradeLevelForm(forms.ModelForm):
     class Meta:

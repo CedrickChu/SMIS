@@ -2,33 +2,28 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, UserProfile, SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, School, Form137, Teacher, StudentYearInfo, TotalGradeSubject, Section, StudentInfo
+from .models import User, SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, School, Form137, Teacher, StudentYearInfo, TotalGradeSubject, Section, StudentInfo
 from .widgets import PastCustomDatePickerWidget
 from django.db import models
 
+
+@admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    model = User
-    list_display = ['email', 'username', 'phone', 'is_active', 'is_staff']
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('username', 'phone', 'first_name', 'about')}),
+        (None, {'fields': ('username', 'password')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'start_date')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username', 'phone', 'password1', 'password2'),
-        }),
+            'fields': ('username', 'password1', 'password2', 'first_name','last_name', 'is_active', 'is_staff', 'is_superuser')}
+        ),
     )
-    search_fields = ['email', 'username', 'phone']
-    ordering = ['email']
-
-admin.site.register(User, CustomUserAdmin)
-
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'address', 'city', 'country', 'postal_code', 'about_me', 'profile_image')
+    list_display = ('username', 'first_name', 'last_name', 'is_staff')
+    search_fields = ('username', 'first_name', 'last_name')
+    ordering = ('username',)
 
 admin.site.unregister(Group)
 admin.site.register(SchoolYear)

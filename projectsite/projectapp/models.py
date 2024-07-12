@@ -4,85 +4,36 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
-class CustomAccountManager(BaseUserManager):
-    def create_user(self, email, username, password=None, **extra_fields):
-        user = self.model(
-            email=self.normalize_email(email),
-            username=username,
-            phone=extra_fields.get('phone', ''),
-        )
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, password=None, **extra_fields):
+        if not username:
+            raise ValueError('The Username must be set')
+        user = self.model(username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password=None, **extra_fields):
+    def create_superuser(self, username, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-
-        return self.create_user(email, username, password, **extra_fields)
+        return self.create_user(username, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(('email address'), unique=True)
-    username = models.CharField(max_length=150, blank=True, unique=True)
-    first_name = models.CharField(max_length=150, blank=True)
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,14}$', message="Phone number must be in the format: '+999999999'. Up to 14 digits allowed.")
-    phone = models.CharField(validators=[phone_regex], max_length=15, unique=True)
-    first_login = models.BooleanField(default=False)
-    start_date = models.DateTimeField(default=timezone.now)
-    about = models.TextField(('about'), max_length=500, blank=True)
+    username = models.CharField(max_length=150, unique=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    objects = CustomAccountManager()
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'phone']
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name=('groups'),
-        blank=True,
-        help_text=('The groups this user belongs to. A user will get all permissions granted to these groups.'),
-        related_name='newuser_set',
-        related_query_name='newuser',
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name=('user permissions'),
-        blank=True,
-        help_text=('Specific permissions for this user.'),
-        related_name='newuser_set',
-        related_query_name='newuser',
-    )
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self):
-        return self.email
-
-    def get_email_field_name(self):
-        return self.email
-
-    def has_perm(self, perm, obj=None):
-        return self.is_staff
-
-    def has_module_perms(self, app_label):
-        return self.is_staff
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    first_name = models.CharField(max_length=150, blank=True, null=True)
-    last_name = models.CharField(max_length=150, blank=True, null=True)
-    address = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=150, blank=True, null=True)
-    country = models.CharField(max_length=150, blank=True, null=True)
-    postal_code = models.IntegerField(blank=True, null=True)
-    about_me = models.TextField(blank=True, null=True)
-    profile_image = models.ImageField(upload_to='profile_images', blank=True, null=True)
-
-    def __str__(self):
-        return self.user.username
+        return self.username
 
 class SchoolYear(models.Model):
     year = models.CharField(max_length=9)

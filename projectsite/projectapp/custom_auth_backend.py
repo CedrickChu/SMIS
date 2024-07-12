@@ -7,7 +7,7 @@ class CustomAuthBackend(ModelBackend):
         UserModel = get_user_model()
 
         try:
-            user = UserModel.objects.get(Q(username=username) | Q(email=username))
+            user = UserModel.objects.get(Q(username=username) | Q(username=username))
         except UserModel.DoesNotExist:
             return None
 

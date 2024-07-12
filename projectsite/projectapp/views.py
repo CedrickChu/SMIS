@@ -14,9 +14,9 @@ from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher, StudentInfo
+from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher, StudentInfo, User
 from django.urls import reverse_lazy
-from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm, StudentInfoForm, ParentGuardianForm
+from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm, StudentInfoForm, ParentGuardianForm, UserRegistrationForm
 from django.db.models import Q 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -70,6 +70,59 @@ def home(request):
 def logout_view(request):
     logout(request)
     return redirect('/')
+
+@login_required
+def user_list(request):
+    users = User.objects.all()
+    user_form = UserRegistrationForm()
+    submit_label = 'Add User'
+    return render(request, 'user/user_list.html', {
+        'users': users,
+        'user_form': user_form,
+        'submit_label': submit_label,
+        'form_title': 'Add User',
+    })
+
+@user_passes_test(lambda u: u.is_superuser)
+@login_required
+def add_user(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            user = user_form.save(commit=False)
+            user.is_staff = True  # Set as staff if required
+            user.is_active = True  # Set as active by default
+            user.save()
+            return redirect('user-list')
+    else:
+        user_form = UserRegistrationForm()
+    
+    submit_label = 'Add User'
+    return render(request, 'user/user_list.html', {
+        'user_form': user_form,
+        'submit_label': submit_label,
+        'form_title': 'Add User',
+    })
+
+@user_passes_test(lambda u: u.is_superuser)
+@login_required
+def update_user(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST, instance=user, exclude_user=user)
+        if user_form.is_valid():
+            user_form.save()
+            return redirect('user-list')
+    else:
+        user_form = UserRegistrationForm(instance=user, exclude_user=user)
+    
+    submit_label = 'Update User'
+    return render(request, 'user/user_list.html', {
+        'user_form': user_form,
+        'submit_label': submit_label,
+        'form_title': 'Edit User',
+    })
 
 
 # class CustomConfirmEmailView(ConfirmEmailView):
