@@ -167,6 +167,10 @@ class StudentInfo(models.Model):
     school_year = models.ForeignKey(SchoolYear, on_delete=models.SET_NULL, null=True)
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
+    
+    class Meta:
+        verbose_name = 'Student Year Information'
+        unique_together = ('student', 'school_year')
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
