@@ -18,13 +18,8 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
+                            
                             <form id="filter-form" method="GET" action="{% url 'allStudent-list' %}">
-                                <div class="input-group no-border" style="float:right; width:20%;">
-                                    <input type="text" style='height:40px;' name="search" value="{{ request.GET.search }}" class="form-control" placeholder="Search...">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="input-group-text"><i class="nc-icon nc-zoom-split"></i></button>
-                                    </div>
-                                </div>
                                 <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
                                     <select name="grade_level" class="form-control" style="height:40px;">
                                         <option value="">Select Grade Level (Default All)</option>
@@ -48,7 +43,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table">
-                                <table class="table table-hover table-bordered">
+                                <table class="table table-hover table-bordered" id='allStudentTable'>
                                     <thead class="text-primary text-center">
                                         <th>LRN No.</th>
                                         <th>Name</th>
@@ -89,6 +84,24 @@
                                     function filterStudents() {
                                         document.getElementById("filter-form").submit();
                                     }
+                                
+                                    $(document).ready(function() {
+                                        $("#allStudentTable").DataTable({
+                                            "aaSorting": [[2, "asc"]],
+                                            "bPaginate": false,
+                                            "bLengthChange": false,
+                                            "info": false,
+                                            "language": {
+                                                "search": ""
+                                            },
+                                            
+                                            "initComplete": function(settings, json) {
+                                                $('.dataTables_filter input[type="search"]').attr('placeholder', 'Search...');
+                                                $('.dataTables_filter input[type="search"]').addClass('form-control');
+                                                $('.dataTables_filter input[type="search"]').before('<i class="nc-icon nc-zoom-split"></i> ');
+                                            }
+                                        });
+                                    });
                                 </script>
                             </div>
                         </div>
@@ -99,6 +112,8 @@
     </div>
 </div>
 
+
 {% include 'student/studentinfo_add_modal.html' %}
+
 
 {% endblock %}

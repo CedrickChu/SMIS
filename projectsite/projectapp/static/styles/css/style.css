@@ -40,3 +40,13 @@ strong {
     width: 40px!important;
 }
 
+
+.dataTables_filter label {
+    display: inline-block;
+    margin-top: -20px;
+}
+
+.dataTables_filter input[type="search"] {
+    display: inline-block; 
+    width: auto; 
+}

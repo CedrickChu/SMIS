@@ -113,17 +113,8 @@ def student_list(request):
     parent_guardians = ParentGuardian.objects.all()
     school_years = SchoolYear.objects.all()
     grade_levels = GradeLevel.objects.all()
-    search_query = request.GET.get('search')
     
-    if search_query:
-        students = students.filter(
-            Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query) |
-            Q(lrn__icontains=search_query) |
-            Q(parent_guardians__first_name__icontains=search_query) |  
-            Q(parent_guardians__last_name__icontains=search_query)
-        )
-    
+ 
     paginator = Paginator(students, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -145,23 +136,15 @@ def allStudent_list(request):
     parent_guardians = ParentGuardian.objects.all()
     grade_level_filter = request.GET.get('grade_level')
     school_level_filter = request.GET.get('school_year')
-    search_query = request.GET.get('search')
 
     if grade_level_filter:
         student_infos = student_infos.filter(grade_level_id=grade_level_filter)
     if school_level_filter:
         student_infos = student_infos.filter(school_year_id=school_level_filter)
-    if search_query:
-        student_infos = student_infos.filter(
-            Q(student__first_name__icontains=search_query) |
-            Q(student__last_name__icontains=search_query) |
-            Q(student__lrn__icontains=search_query)
-        )
 
     paginator = Paginator(student_infos, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
     grade_levels = GradeLevel.objects.all()
     school_years = SchoolYear.objects.all()
     students = [info.student for info in student_infos]
@@ -610,13 +593,7 @@ def update_section(request, pk):
 @login_required
 def teacher_list(request):
     teachers = Teacher.objects.all()
-    search_query = request.GET.get('search')
 
-    if search_query:
-        teachers = teachers.filter(
-            Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query) 
-        )
     paginator = Paginator(teachers, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)

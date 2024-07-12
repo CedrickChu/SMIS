@@ -6,7 +6,7 @@
         {% include '../navbar.html' %}
         <div class="content">
             <div class="container" style="margin-top: 20px;">
-                <h4 class="card-title"> Teacher List
+                <h4 class="card-title"> 
                     {% if request.user.is_superuser%}
                     <button style="float:right" type="button" class="btn btn-info" data-toggle="modal" data-target="#addTeacherModal">
                         <i class="glyphicon glyphicon-plus"></i> New Entry
@@ -19,18 +19,11 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <form id="filter-form" method="GET" action="{% url 'teacher-list' %}">
-                                <div class="input-group no-border" style="float:right; width:20%;">
-                                    <input type="text" style='height:40px;' name="search" value="{{ request.GET.search }}" class="form-control" placeholder="Search...">
-                                    <div class="input-group-append">
-                                        <button type="submit" class="input-group-text"><i class="nc-icon nc-zoom-split"></i></button>
-                                    </div>
-                                </div>
-                            </form>
+                            <h1 class="text-center">Teacher List</h1>
                         </div>
                         <div class="card-body">
                             <div class="table">
-                                <table class="table table-hover table-bordered">
+                                <table class="table table-hover table-bordered" id="teacherTable">
                                     <thead class="text-primary text-center">
                                         <th>Name</th>
                                         <th>Address</th>
@@ -87,6 +80,25 @@
 
 
 <script>
+    $(document).ready(function() {
+        $("#teacherTable").DataTable({
+            "aaSorting": [[2, "asc"]],
+            "bPaginate": false,
+            "bLengthChange": false,
+            "info": false,
+            "language": {
+                "search": ""
+            },
+            
+            "initComplete": function(settings, json) {
+                $('.dataTables_filter input[type="search"]').attr('placeholder', 'Search...');
+                $('.dataTables_filter input[type="search"]').addClass('form-control');
+                $('.dataTables_filter input[type="search"]').before('<i class="nc-icon nc-zoom-split"></i> ');
+            }
+        });
+    });
+
+
     $('.edit_teacher').click(function() {
         const teacherId = $(this).attr('data-id');
         $.ajax({
@@ -123,6 +135,8 @@
             });
         }
     });
+
+
 </script>
 
 
