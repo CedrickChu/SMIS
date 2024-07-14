@@ -16,7 +16,7 @@ from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import SchoolYear, GradeLevel, Student, Subject, ParentGuardian, Section, Teacher, StudentInfo, User, StudentGrade
 from django.urls import reverse_lazy
-from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm, StudentInfoForm, ParentGuardianForm, UserRegistrationForm
+from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm, StudentInfoForm, ParentGuardianForm, UserRegistrationForm, StudentGradeForm
 from django.db.models import Q 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -770,15 +770,75 @@ def delete_teacher(request):
     return JsonResponse(0, safe=False) 
 
 
-def student_academic_record(request, student_info_id):
-    student_info = get_object_or_404(StudentInfo, id=student_info_id)
-    student = student_info.student
-    student_grades = StudentGrade.objects.filter(student=student_info)
-    
+
+def student_academic_record(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    student_infos = StudentInfo.objects.filter(student=student)
+    subjects = Subject.objects.all()
+
+    default_student_info = student_infos.first()
+    if not default_student_info:
+        pass
+
+    student_grades = StudentGrade.objects.filter(student=default_student_info)
+    grade_levels = set(info.grade_level for info in student_infos)
+
+    grade_level_id = None  # Initialize grade_level_id
+
+    # Handle filtering by grade level if form is submitted
+    if 'grade_level' in request.GET:
+        grade_level_id = request.GET.get('grade_level')
+        if grade_level_id:
+            student_info = StudentInfo.objects.filter(student=student, grade_level=grade_level_id).first()
+            if student_info:
+                student_grades = StudentGrade.objects.filter(student=student_info)
+                default_student_info = student_info 
+
+    # Handle form submission to add StudentGrade
+    if request.method == 'POST':
+        form = StudentGradeForm(request.POST)
+        if form.is_valid():
+            student_grade = form.save(commit=False)
+            student_grade.student = default_student_info 
+            student_grade.save()
+            
+            # Redirect to the same page with the grade_level parameter
+            url = reverse('student_academic_record', args=[student_id])
+            if grade_level_id:
+                url += f'?grade_level={grade_level_id}#{grade_level_id}'
+            return redirect(url)
+    else:
+        form = StudentGradeForm()
+
     context = {
         'student': student,
-        'grade_level': student_info.grade_level,
+        'student_infos': student_infos,
+        'default_student_info': default_student_info,
         'student_grades': student_grades,
+        'grade_levels': grade_levels,
+        'subjects': subjects,
+        'form': form,
     }
-    
+
     return render(request, 'student/student_academic_record.html', context)
+
+# def add_student_grade(request):
+#     if request.method == 'POST':
+#         form = StudentGradeForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return JsonResponse({'success': True})
+#         else:
+#             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+#     else:
+#         student_info_id = request.GET.get('student_info_id')
+#         student_info = get_object_or_404(StudentInfo, id=student_info_id)
+#         student = student_info.student
+
+#         graded_subjects = StudentGrade.objects.filter(student=student_info).values_list('subject_id', flat=True)
+#         subjects = Subject.objects.filter(grade_level=student_info.grade_level).exclude(id__in=graded_subjects)
+
+#         form = StudentGradeForm(initial={'student': student_info.id})
+#         return render(request, 'student/add_student_grade.html', {'form': form, 'subjects': subjects, 'student_info': student_info, 'student': student})
+
+

@@ -96,7 +96,6 @@ class Student(models.Model):
     gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')], default='M')
     address = models.TextField(help_text='Full Address')
     parent_guardians = models.ForeignKey(ParentGuardian,  on_delete=models.SET_NULL, null=True, help_text='List of Parents/Guardians')
-    promoted = models.BooleanField(default=False)
 
     def clean(self):
         if self.middle_name is None:
@@ -110,6 +109,10 @@ class StudentInfo(models.Model):
     school_year = models.ForeignKey(SchoolYear, on_delete=models.SET_NULL, null=True)
     section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
     grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
+    paid_first_quarter = models.BooleanField(default=False)
+    paid_second_quarter = models.BooleanField(default=False)
+    paid_third_quarter = models.BooleanField(default=False)
+    paid_fourth_quarter = models.BooleanField(default=False)
     
     class Meta:
         verbose_name = 'Student Year Information'

@@ -42,6 +42,9 @@ urlpatterns = [
     path('users/add', views.add_user, name='user-add'),
     path('users/<int:pk>/update/', views.update_user, name='user-update'),
     path('invalid/', views.custom_page, name='custom_page'),
-    path('student-academic/<int:student_info_id>/', views.student_academic_record, name='student-academic-record'),
+    path('student-academic/<int:student_id>/', views.student_academic_record, name='student_academic_record'),
+
+    # path('student-academic/add/', views.add_student_grade, name='student-grade-add')
+
 
 ]

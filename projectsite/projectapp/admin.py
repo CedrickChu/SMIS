@@ -38,13 +38,12 @@ class StudentAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateField: {'widget': PastCustomDatePickerWidget},
     }
-    list_display = ['lrn','first_name', 'middle_name', 'last_name', 'birth_date', 'place_of_birth', 'gender','address','promoted', ]
+    list_display = ['lrn','first_name', 'middle_name', 'last_name', 'birth_date', 'place_of_birth', 'gender','address', ]
     search_fields = ['first_name', 'last_name']
-    list_filter = ['promoted']
 
     fieldsets = (
         (None, {
-            'fields': ('lrn','first_name','middle_name', 'last_name', 'birth_date', 'place_of_birth', 'gender','address','parent_guardians','promoted')
+            'fields': ('lrn','first_name','middle_name', 'last_name', 'birth_date', 'place_of_birth', 'gender','address','parent_guardians',)
         }),
     )
 

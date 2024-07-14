@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import User, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section, Teacher, StudentInfo
+from .models import User, Student, Subject, GradeLevel, SchoolYear, ParentGuardian, Section, Teacher, StudentInfo, StudentGrade
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
@@ -133,3 +133,21 @@ class LogoutForm(forms.Form):
 
 class GradeLevelFilterForm(forms.Form):
     grade_level = forms.ModelChoiceField(queryset=GradeLevel.objects.all(), required=True, label='Grade Level')
+
+
+class StudentGradeForm(forms.ModelForm):
+    student = forms.IntegerField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = StudentGrade
+        fields = ['student', 'subject', 'first_grading', 'second_grading', 'third_grading', 'fourth_grading']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        student = cleaned_data.get('student')
+        subject = cleaned_data.get('subject')
+
+        if StudentGrade.objects.filter(student_id=student, subject=subject).exists():
+            raise forms.ValidationError(f'A grade for {subject.name} already exists for this student.')
+
+        return cleaned_data

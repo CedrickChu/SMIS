@@ -1,10 +1,17 @@
-fix filter for all student table
+fix filter for all student table  <dome>
 
-add parent update/delete
+add parent update/delete <done>
 
 add inputable select tag. <done>
 
+filter by school year when printing all students <done>
 
-filter by school year when printing all students
+calculate age (current datetime - birthdatetime)  <done>
 
-calculate age (current datetime - birthdatetime)
+add pagination <done>
+
+add user list <done>
+
+payment tracking 
+
+
