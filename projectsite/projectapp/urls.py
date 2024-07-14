@@ -43,6 +43,7 @@ urlpatterns = [
     path('users/', views.user_list, name='user-list'),
     path('users/add', views.add_user, name='user-add'),
     path('users/<int:pk>/update/', views.update_user, name='user-update'),
+    path('invalid/', views.custom_page, name='custom_page'),
 
 
 ]

@@ -44,6 +44,9 @@ from django.core.paginator import Paginator
 def is_superuser(user):
     return user.is_superuser
 
+def custom_page(request):
+    return render(request, 'custom_page.html')
+
 def login_view(request):
     if request.user.is_authenticated:
          return redirect('home')
@@ -86,12 +89,14 @@ def user_list(request):
 @user_passes_test(lambda u: u.is_superuser)
 @login_required
 def add_user(request):
+    if not request.user.is_superuser:
+        return redirect('custom_page')
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         if user_form.is_valid():
             user = user_form.save(commit=False)
-            user.is_staff = True  # Set as staff if required
-            user.is_active = True  # Set as active by default
+            user.is_staff = True  
+            user.is_active = True  
             user.save()
             return redirect('user-list')
     else:
@@ -107,23 +112,37 @@ def add_user(request):
 @user_passes_test(lambda u: u.is_superuser)
 @login_required
 def update_user(request, pk):
-    user = get_object_or_404(User, pk=pk)
+    user = User.objects.get(pk=pk)
     
     if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST, instance=user, exclude_user=user)
-        if user_form.is_valid():
-            user_form.save()
-            return redirect('user-list')
+        form = UserRegistrationForm(request.POST, instance=user)
+        if form.is_valid():
+            # Get the cleaned data
+            cleaned_data = form.cleaned_data
+            
+            # Update user fields based on form data
+            user.username = cleaned_data['username']
+            user.first_name = cleaned_data['first_name']
+            user.last_name = cleaned_data['last_name']
+            user.is_superuser = cleaned_data['is_superuser']
+            
+            # Check if password1 is provided and set the password if so
+            password1 = cleaned_data.get('password1')
+            if password1:
+                user.set_password(password1)
+            
+            user.save()
+            messages.success(request, 'User updated successfully.')
+            return redirect('home')
     else:
-        user_form = UserRegistrationForm(instance=user, exclude_user=user)
+        form = UserRegistrationForm(instance=user)
     
-    submit_label = 'Update User'
-    return render(request, 'user/user_list.html', {
-        'user_form': user_form,
-        'submit_label': submit_label,
+    context = {
+        'form': form,
         'form_title': 'Edit User',
-    })
-
+        'submit_label': 'Update User',
+    }
+    return render(request, 'user/user_list.html', context)
 
 # class CustomConfirmEmailView(ConfirmEmailView):
 #     def get(self, *args, **kwargs):
