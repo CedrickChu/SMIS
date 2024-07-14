@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from django.http import Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import SchoolYear, GradeLevel, Student, Subject, AcademicRecord, ParentGuardian, Form137, School, StudentYearInfo, TotalGradeSubject, Section, Teacher, StudentInfo, User
+from .models import SchoolYear, GradeLevel, Student, Subject, ParentGuardian, Section, Teacher, StudentInfo, User, StudentGrade
 from django.urls import reverse_lazy
 from .forms import StudentForm, ParentGuardianForm, GradeLevelForm, SubjectForm, SchoolYearForm, SectionForm, TeacherForm, StudentInfoForm, ParentGuardianForm, UserRegistrationForm
 from django.db.models import Q 
@@ -117,16 +117,12 @@ def update_user(request, pk):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, instance=user)
         if form.is_valid():
-            # Get the cleaned data
             cleaned_data = form.cleaned_data
-            
-            # Update user fields based on form data
             user.username = cleaned_data['username']
             user.first_name = cleaned_data['first_name']
             user.last_name = cleaned_data['last_name']
             user.is_superuser = cleaned_data['is_superuser']
             
-            # Check if password1 is provided and set the password if so
             password1 = cleaned_data.get('password1')
             if password1:
                 user.set_password(password1)
@@ -393,19 +389,13 @@ class StudentDeleteView(DeleteView):
 @login_required
 def subject_list(request):
     search_query = request.GET.get('search', '')
-    grade_level_id = request.GET.get('grade_level', '')
 
     subjects = Subject.objects.all()
     if search_query:
         subjects = subjects.filter(name__icontains=search_query)
-    if grade_level_id:
-        subjects = subjects.filter(grade_level_id=grade_level_id)
-
-    grade_levels = GradeLevel.objects.all()
 
     return render(request, 'maintenance/subject_list.html', {
         'subjects': subjects,
-        'grade_levels': grade_levels,
         'subject_form': SubjectForm(),
         'form_title': 'Add Subject',
         'submit_label': 'Add Subject',
@@ -517,32 +507,6 @@ def student_report(request):
         'grade_levels': grade_levels,
     }
     return render(request, 'report/student_record.html', context)
-
-@login_required
-def student_report_card(request):
-    student_year_infos = StudentYearInfo.objects.all()
-    grade_levels = GradeLevel.objects.all()
-    search_query = request.GET.get('search')
-
-    context = {
-        'student_year_infos': student_year_infos,
-        'grade_levels': grade_levels,
-    }
-    return render(request, 'report/student_report_card.html', context)
-
-@login_required
-def student_record_view(request, id):
-    student_infos = get_object_or_404(StudentYearInfo, id=id)
-    school_years = SchoolYear.objects.all()
-    grade_levels = GradeLevel.objects.all()
-    total_grade_subjects = TotalGradeSubject.objects.all()
-    context = {
-        'student_info': student_infos,
-        'school_years': school_years,
-        'grade_levels': grade_levels,
-        'total_grade_subjects': total_grade_subjects,
-    }
-    return render(request, 'report/student_info.html', context)
 
 @login_required
 def student_form137(request, pk):
@@ -760,7 +724,8 @@ def parent_list(request):
         }
     return render(request, 'maintenance/parent_list.html', context)
 
-
+@user_passes_test(is_superuser)
+@login_required
 def update_parent(request, pk):
     parent = get_object_or_404(ParentGuardian, pk=pk)
 
@@ -782,6 +747,8 @@ def update_parent(request, pk):
         }
         return JsonResponse(parent_data)  
     
+@user_passes_test(is_superuser)
+@login_required
 @csrf_exempt
 def delete_parent(request):
     if request.method == 'POST' and request.user.is_superuser:
@@ -791,6 +758,8 @@ def delete_parent(request):
         return JsonResponse(1, safe=False) 
     return JsonResponse(0, safe=False) 
 
+@user_passes_test(is_superuser)
+@login_required
 @csrf_exempt
 def delete_teacher(request):
     if request.method == 'POST' and request.user.is_superuser:
@@ -800,3 +769,16 @@ def delete_teacher(request):
         return JsonResponse(1, safe=False) 
     return JsonResponse(0, safe=False) 
 
+
+def student_academic_record(request, student_info_id):
+    student_info = get_object_or_404(StudentInfo, id=student_info_id)
+    student = student_info.student
+    student_grades = StudentGrade.objects.filter(student=student_info)
+    
+    context = {
+        'student': student,
+        'grade_level': student_info.grade_level,
+        'student_grades': student_grades,
+    }
+    
+    return render(request, 'student/student_academic_record.html', context)

@@ -19,16 +19,6 @@
                                         <button type="submit" class="input-group-text"><i class="nc-icon nc-zoom-split"></i></button>
                                     </div>
                                 </div>
-                                <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
-                                    <select name="grade_level" class="form-control" style="height:40px;">
-                                        {% for level in grade_levels %}
-                                        <option value="{{ level.id }}" {% if request.GET.grade_level == level.id|stringformat:'s' %} selected {% endif %}>{{ level.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div style="float: right; margin-right: 10px; margin-top:-10px;">
-                                    <button style='height:40px;' type="button" class="btn btn-primary" onclick="filterSubjects()">Filter</button>
-                                </div>
                             </form>
                         </div>
                         <div class="panel-body">
@@ -36,7 +26,6 @@
                                 <thead>
                                     <tr class="text-center">
                                         <th style="width:20%">Subject</th>
-                                        <th style="width:10%">Grade Level</th>
                                         {% if request.user.is_superuser%}
                                         <th style="width:10%">Action</th>
                                         {% endif %}
@@ -46,7 +35,6 @@
                                     {% for subject in subjects %}
                                     <tr class="text-center">
                                         <td><input id="subject{{ subject.id }}" type="text" style="border:0px" value="{{ subject.name }}" readonly></td>
-                                        <td><input id="grade-level{{ subject.id }}" type="text" style="border:0px" value="{{ subject.grade_level.name }}" readonly></td>
                                         {% if request.user.is_superuser%}
                                         <td class="text-center">
                                             <a href="#" onclick="editSubject('{{ subject.id }}', '{{ subject.grade_level.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
@@ -87,14 +75,6 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="grade_level">Grade Level</label>
-                                        <select style='height:40px;' class="form-control" id="grade_level" name="grade_level" required>
-                                            {% for level in grade_levels %}
-                                                <option value="{{ level.id }}">{{ level.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
                                     <div id="status"></div>
                                     <div class="form-group">
                                         <input type="button" class="btn btn-info" id="reset" name="reset" value="Cancel" onclick="resetForm()">
@@ -112,9 +92,7 @@
 </div>
 
 <script>
-    function filterSubjects() {
-        document.getElementById("filter-form").submit();
-    }
+    
     function editSubject(subjectId, gradeLevelId) {
         var subjectName = document.getElementById('subject' + subjectId).value;
         document.getElementById('subject-form').action = "{% url 'subject-update' pk=0 %}".replace('0', subjectId);

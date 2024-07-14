@@ -63,13 +63,6 @@ class ParentGuardian(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
-
-class School(models.Model):
-    name = models.CharField(max_length=100)
-    address = models.TextField()
-
-    def __str__(self):
-        return self.name
     
 class Teacher(models.Model):
     first_name = models.CharField(max_length=100)
@@ -89,7 +82,6 @@ class Section(models.Model):
     name = models.CharField(max_length=100)
     grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE)
     adviser = models.OneToOneField(Teacher, on_delete=models.CASCADE)
-
 
     def __str__(self):
         return self.name
@@ -125,86 +117,53 @@ class StudentInfo(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
-    grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
 
     
-class StudentYearInfo(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    school = models.ForeignKey(School, on_delete=models.CASCADE)
-    grade_level = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, related_name='current_grade_level')
-    school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE)
-    adviser = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    gen_ave = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    to_be_classified = models.ForeignKey(GradeLevel, on_delete=models.CASCADE, related_name='next_grade_level')
-    tdays_of_classes = models.IntegerField(null=True, blank=True)
-    tdays_of_present = models.IntegerField(null=True, blank=True)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE, null=True)
-    promoted = models.BooleanField(default=False)
-    class Meta:
-        verbose_name = 'Student Year Information'
-        verbose_name_plural = 'Student Year Information'
-
-    def __str__(self):
-        return f'{self.student} - Grade {self.grade_level} - {self.school_year}'
-       
-class TotalGradeSubject(models.Model):
-    TGS_ID = models.AutoField(primary_key=True)
-    STUDENT_ID = models.ForeignKey(Student, on_delete=models.CASCADE)
-    SYI_ID = models.ForeignKey(StudentYearInfo, on_delete=models.CASCADE)
-    SUBJECT = models.ForeignKey(Subject, on_delete=models.CASCADE)
+class StudentGrade(models.Model):
+    student = models.ForeignKey(StudentInfo, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     first_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     second_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     third_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     fourth_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    FINAL_GRADES = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    PASSED_FAILED = models.CharField(max_length=20, null=True, blank=True)
-
-    class Meta:
-        verbose_name = 'Total Grade Subject'
-        verbose_name_plural = 'Total Grade Subjects'
 
     def __str__(self):
-        return f'{self.STUDENT_ID} - {self.SUBJECT} - {self.SYI_ID.school_year}'
+        return f"{self.student.student} - {self.subject}"
 
-class AcademicRecord(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    school_year = models.ForeignKey(SchoolYear, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    grade = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.student} - {self.subject} - {self.school_year}"
-    
-
-    
-class Form137(models.Model):
-    student = models.OneToOneField(Student, on_delete=models.CASCADE)
-    school = models.ForeignKey(School, on_delete=models.CASCADE)
-    records = models.ManyToManyField(AcademicRecord, blank=True)
-
-    def __str__(self):
-        return f"Form 137 - {self.student}"
-    
+    @property
+    def final_grade(self):
+        """Calculate and return the final grade based on available gradings."""
+        gradings = [
+            self.first_grading,
+            self.second_grading,
+            self.third_grading,
+            self.fourth_grading,
+        ]
+        valid_gradings = [g for g in gradings if g is not None]
+        if valid_gradings:
+            return sum(valid_gradings) / len(valid_gradings)
+        return None
 
 
-class Payment(models.Model):
-    payment_user = models.ForeignKey(User, on_delete=models.CASCADE)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date_paid = models.DateField(auto_now_add=True)
-    payment_method = models.CharField(max_length=50)
-    status = models.CharField(max_length=20, choices=[
-        ('paid', 'Paid'),
-        ('pending', 'Pending'),
-        ('refunded', 'Refunded'),
-    ])
-    notes = models.TextField(blank=True)
 
-    def __str__(self):
-        return f"{self.student}'s Tuition Fee Payment"
+# class Payment(models.Model):
+#     payment_user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     date_paid = models.DateField(auto_now_add=True)
+#     payment_method = models.CharField(max_length=50)
+#     status = models.CharField(max_length=20, choices=[
+#         ('paid', 'Paid'),
+#         ('pending', 'Pending'),
+#         ('refunded', 'Refunded'),
+#     ])
+#     notes = models.TextField(blank=True)
+
+#     def __str__(self):
+#         return f"{self.student}'s Tuition Fee Payment"
     
 class EventCategory(models.Model):
     name = models.CharField(max_length=200)

@@ -22,8 +22,6 @@ urlpatterns = [
     path('subject/<int:pk>/update/', views.update_subject, name='subject-update'),
     path('report/form137/', views.student_report, name='student_record'),
     path('report/<int:pk>/form137/', views.student_form137, name='student-report-print'),
-    path('rms/', views.student_report_card, name='student-academic-record'),
-    path('rms/<int:id>/', views.student_record_view, name='student-report-card'),
     path('schoolyear/', views.school_year, name='schoolyear-list'),
     path('schoolyear/add/', views.add_year, name='year-add'),
     path('schoolyear/<int:pk>/update/', views.update_year, name='year-update'),
@@ -44,6 +42,6 @@ urlpatterns = [
     path('users/add', views.add_user, name='user-add'),
     path('users/<int:pk>/update/', views.update_user, name='user-update'),
     path('invalid/', views.custom_page, name='custom_page'),
-
+    path('student-academic/<int:student_info_id>/', views.student_academic_record, name='student-academic-record'),
 
 ]

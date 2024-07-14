@@ -62,11 +62,9 @@
                 <li>
                     <a href="{% url 'student-list' %}" ><i class="fa fa-graduation-cap"></i> Students List</a>
                 </li>
+               
                 <li>
-                    <a href="#"><i class="fa fa-archive" aria-hidden="true"></i> Form 137</a>
-                </li>
-                <li>
-                    <a href="{% url 'student-academic-record'%}"><i class="fa fa-book"></i>Academic Record</a>
+                    <a href="#" data-toggle="modal" data-target="#academicRecordModal"><i class="fa fa-book"></i> Academic Record</a>
                 </li>
             </ul>
         </li>
@@ -110,6 +108,7 @@
       </ul>
     </div>
   </div>
+  {% include 'student/student_academic_record_modal.html'%}
   <script>
 
     $('.side-nav li a').each(function(){

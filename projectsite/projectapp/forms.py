@@ -5,7 +5,6 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 
 
-
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
@@ -63,12 +62,7 @@ class StudentForm(forms.ModelForm):
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
-        fields = ['name', 'grade_level']
-
-    def __init__(self, *args, **kwargs):
-        super(SubjectForm, self).__init__(*args, **kwargs)
-        self.fields['grade_level'].queryset = GradeLevel.objects.all()  
-        self.fields['grade_level'].label = 'Grade Level'  
+        fields = ['name']
 
 class SchoolYearForm(forms.ModelForm):
     STATUS_CHOICES = (
