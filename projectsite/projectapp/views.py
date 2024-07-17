@@ -817,6 +817,43 @@ def student_academic_record(request, student_id):
     }
 
     return render(request, 'student/student_academic_record.html', context)
+
+
+@require_POST
+def fetch_student_grade(request, grade_id):
+    grade = get_object_or_404(StudentGrade, id=grade_id)
+    data = {
+        'id': grade.id,
+        'first_grading': grade.first_grading,
+        'second_grading': grade.second_grading,
+        'third_grading': grade.third_grading,
+        'fourth_grading': grade.fourth_grading,
+    }
+    return JsonResponse(data)
+
+@require_POST
+def update_student_grade(request, grade_id):
+    grade = get_object_or_404(StudentGrade, id=grade_id)
+
+    # Update grade fields
+    grade.first_grading = request.POST.get('first_grading')
+    grade.second_grading = request.POST.get('second_grading')
+    grade.third_grading = request.POST.get('third_grading')
+    grade.fourth_grading = request.POST.get('fourth_grading')
+    grade.save()
+
+    return JsonResponse({'success': True, 'message': 'Grade updated successfully.'})
+
+@require_POST
+def delete_student_grade(request, grade_id):
+    grade = get_object_or_404(StudentGrade, id=grade_id)
+    grade.delete()
+    return JsonResponse({'success': True, 'message': 'Grade deleted successfully.'})
+
+
+
+
+
 # def add_student_grade(request):
 #     if request.method == 'POST':
 #         form = StudentGradeForm(request.POST)

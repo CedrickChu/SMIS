@@ -43,8 +43,13 @@ urlpatterns = [
     path('user/update/<int:pk>/', views.user_update, name='user-update'),
     path('invalid/', views.custom_page, name='custom_page'),
     path('student-academic/<int:student_id>/', views.student_academic_record, name='student_academic_record'),
+    path('fetch_student_grade/<int:grade_id>/', views.fetch_student_grade, name='fetch_student_grade'),
+    path('update_student_grade/<int:grade_id>/', views.update_student_grade, name='update_student_grade'),
+    path('delete_student_grade/<int:grade_id>/', views.delete_student_grade, name='delete_student_grade'),
+]
+    
 
     # path('student-academic/add/', views.add_student_grade, name='student-grade-add')
 
 
-]
+
