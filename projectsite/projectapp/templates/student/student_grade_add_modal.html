@@ -8,6 +8,7 @@
             <div class="modal-body">
                 <form id="add-student-grade-form" method="POST" action="{% url 'student_academic_record' student.id %}">
                     {% csrf_token %}
+                    <input type="hidden" name="student_info" value="{{ default_student_info.id }}">
                     <div class="form-group">
                         <label for="subject">Subject</label>
                         <select name="subject" class="form-control" required>

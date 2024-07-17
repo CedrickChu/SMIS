@@ -22,7 +22,7 @@
                                     <select style='height:40px; width:40%;' class="form-control mr-2 js-selectize-student" name="student" required>
                                         <option value="" disabled selected style="display:none;"> Enter Student </option>
                                         {% for student in allStudents %}
-                                            <option value="{{ student.id }}">{{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</option>
+                                            <option value="{{ student.id }}">{{ student.lrn}} - {{ student.first_name }} {{ student.middle_name }} {{ student.last_name }}</option>
                                         {% endfor %}
                                     </select>
                                     <button style="background-color:white;border: none;" class='read-more-info-icon' type="button" data-toggle="modal" data-target="#addStudentModal">
@@ -47,7 +47,7 @@
                         <label for="school_year">School Year:</label>
                         <select style='height:40px;' class="form-control" name="school_year" required>
                             {% for year in school_years %}
-                                <option value="{{ year.id }}">{{ year.year }}</option>
+                                <option value="{{ year.id }}" {% if year.status %}selected{% endif %}>{{ year.year }}</option>
                             {% endfor %}
                         </select>
                     </div>

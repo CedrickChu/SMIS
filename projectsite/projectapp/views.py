@@ -47,6 +47,7 @@ def is_superuser(user):
 def custom_page(request):
     return render(request, 'custom_page.html')
 
+
 def login_view(request):
     if request.user.is_authenticated:
          return redirect('home')
@@ -74,71 +75,58 @@ def logout_view(request):
     logout(request)
     return redirect('/')
 
+
+@user_passes_test(is_superuser)
 @login_required
 def user_list(request):
     users = User.objects.all()
     user_form = UserRegistrationForm()
-    submit_label = 'Add User'
-    return render(request, 'user/user_list.html', {
+    context = {
         'users': users,
         'user_form': user_form,
-        'submit_label': submit_label,
-        'form_title': 'Add User',
-    })
+        'form_title': 'New User',
+        'submit_label': 'Save'
+    }
+    return render(request, 'user/user_list.html', context)
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(is_superuser)
 @login_required
-def add_user(request):
-    if not request.user.is_superuser:
-        return redirect('custom_page')
+def user_add(request):
     if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
-        if user_form.is_valid():
-            user = user_form.save(commit=False)
-            user.is_staff = True  
-            user.is_active = True  
-            user.save()
-            return redirect('user-list')
-    else:
-        user_form = UserRegistrationForm()
-    
-    submit_label = 'Add User'
-    return render(request, 'user/user_list.html', {
-        'user_form': user_form,
-        'submit_label': submit_label,
-        'form_title': 'Add User',
-    })
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('user-list'))
+        else:
+            users = User.objects.all()
+            context = {
+                'users': users,
+                'user_form': form,
+                'form_title': 'New User',
+                'submit_label': 'Save'
+            }
+            return render(request, 'user/user_list.html', context)
+    return redirect(reverse('user-list'))
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(is_superuser)
 @login_required
-def update_user(request, pk):
-    user = User.objects.get(pk=pk)
-    
+def user_update(request, pk):
+    user = get_object_or_404(User, pk=pk)
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, instance=user)
         if form.is_valid():
-            cleaned_data = form.cleaned_data
-            user.username = cleaned_data['username']
-            user.first_name = cleaned_data['first_name']
-            user.last_name = cleaned_data['last_name']
-            user.is_superuser = cleaned_data['is_superuser']
-            
-            password1 = cleaned_data.get('password1')
-            if password1:
-                user.set_password(password1)
-            
-            user.save()
-            messages.success(request, 'User updated successfully.')
-            return redirect('home')
-    else:
-        form = UserRegistrationForm(instance=user)
-    
-    context = {
-        'form': form,
-        'form_title': 'Edit User',
-        'submit_label': 'Update User',
-    }
-    return render(request, 'user/user_list.html', context)
+            form.save()
+            return redirect(reverse('user-list'))
+        else:
+            users = User.objects.all()
+            context = {
+                'users': users,
+                'user_form': form,
+                'form_title': 'Edit User',
+                'submit_label': 'Update'
+            }
+            return render(request, 'user/user_list.html', context)
+    return redirect(reverse('user-list'))
 
 # class CustomConfirmEmailView(ConfirmEmailView):
 #     def get(self, *args, **kwargs):
@@ -173,8 +161,6 @@ def update_user(request, pk):
 
 #     return render(request, 'account/verification_sent.html', {'message': message})
 
-
-
 @login_required
 def student_list(request):
     students = Student.objects.all()
@@ -197,6 +183,7 @@ def student_list(request):
         'is_paginated': page_obj.has_other_pages(),
     }
     return render(request, 'student/student_list.html', context)
+
 
 @login_required
 def allStudent_list(request):
@@ -778,9 +765,9 @@ def student_academic_record(request, student_id):
 
     default_student_info = student_infos.first()
     if not default_student_info:
-        pass
+        default_student_info = None
 
-    student_grades = StudentGrade.objects.filter(student=default_student_info)
+    student_grades = StudentGrade.objects.filter(student=default_student_info) if default_student_info else None
     grade_levels = set(info.grade_level for info in student_infos)
 
     grade_level_id = None  # Initialize grade_level_id
@@ -821,7 +808,6 @@ def student_academic_record(request, student_id):
     }
 
     return render(request, 'student/student_academic_record.html', context)
-
 # def add_student_grade(request):
 #     if request.method == 'POST':
 #         form = StudentGradeForm(request.POST)

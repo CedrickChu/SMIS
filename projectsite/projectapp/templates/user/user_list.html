@@ -25,7 +25,6 @@
                                 <tbody>
                                     {% for user in users %}
                                     <tr>
-                                       
                                         <td>
                                             <input id="user-username-{{ user.id }}" type="text" style="border:0px" value="{{ user.username }}" readonly>
                                         </td>
@@ -33,8 +32,6 @@
                                             <input id="user-first_name-{{ user.id }}" type="text" style="border:0px" value="{{ user.first_name }}" readonly>
                                             <input id="user-last_name-{{ user.id }}" type="text" style="border:0px" value="{{ user.last_name }}" readonly>
                                         </td>
-                                   
-                                      
                                         <td>
                                             <input id="user-is_superuser-{{ user.id }}" type="text" style="border:0px" value="{% if user.is_superuser %}ADMINISTRATOR{% else %}STAFF{% endif %}" readonly>
                                         </td>
@@ -166,46 +163,44 @@
     </div>
 </div>
 
-
 <script>
-    
     function editUser(userId) {
         var username = document.getElementById('user-username-' + userId).value;
         var first_name = document.getElementById('user-first_name-' + userId).value;
         var last_name = document.getElementById('user-last_name-' + userId).value;
-        var is_admin = document.getElementById('user-is_superuser-' + userId).value === 'ADMINISTRATOR';
-        
-        document.getElementById('user-form').action = "{% url 'user-update' pk=0 %}".replace('0', userId);
+        var is_admin = document.getElementById('user-is_superuser-' + userId).value;
+
         document.getElementById('id').value = userId;
         document.getElementById('username').value = username;
         document.getElementById('first_name').value = first_name;
         document.getElementById('last_name').value = last_name;
-        document.getElementById('is_superuser').value = is_admin ? 'True' : 'False';
-        document.getElementById('head').innerText = 'Edit User';
-        document.getElementById('btn_submit').innerText = 'Update User';
-        
-        
+        document.getElementById('is_superuser').value = is_admin === 'ADMINISTRATOR' ? 'True' : 'False';
+        document.getElementById('head').innerHTML = "Edit User";
+        document.getElementById('user-form').action = "{% url 'user-update' 0 %}".replace('0', userId);
+        document.getElementById('password1').removeAttribute('required');
+        document.getElementById('password2').removeAttribute('required');
+        document.getElementById('btn_submit').innerHTML = "Update";
     }
 
     function resetForm() {
+        document.getElementById('id').value = "";
+        document.getElementById('username').value = "";
+        document.getElementById('password1').value = "";
+        document.getElementById('password2').value = "";
+        document.getElementById('first_name').value = "";
+        document.getElementById('last_name').value = "";
+        document.getElementById('is_superuser').value = "False";
+        document.getElementById('head').innerHTML = "New User";
         document.getElementById('user-form').action = "{% url 'user-add' %}";
-        document.getElementById('id').value = '';
-        document.getElementById('username').value = '';
-        document.getElementById('password1').value = '';
-        document.getElementById('password2').value = '';
-        document.getElementById('first_name').value = '';
-        document.getElementById('last_name').value = '';
-        document.getElementById('is_superuser').value = '';
-        document.getElementById('head').innerText = '{{ form_title }}';
-        document.getElementById('btn_submit').innerText = '{{ submit_label }}';
+        document.getElementById('password1').setAttribute('required', 'required');
+        document.getElementById('password2').setAttribute('required', 'required');
+        document.getElementById('btn_submit').innerHTML = "Save";
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('confirmSubmitButton').addEventListener('click', function() {
-            document.getElementById('user-form').submit();
-        });
+    document.getElementById('confirmSubmitButton').addEventListener('click', function() {
+        document.getElementById('user-form').submit();
     });
-    
-</script>
 
+  
+</script>
 {% endblock %}

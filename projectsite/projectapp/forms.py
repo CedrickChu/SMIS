@@ -40,6 +40,7 @@ class UserRegistrationForm(UserCreationForm):
         return user
 
 
+
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
@@ -135,19 +136,24 @@ class GradeLevelFilterForm(forms.Form):
     grade_level = forms.ModelChoiceField(queryset=GradeLevel.objects.all(), required=True, label='Grade Level')
 
 
-class StudentGradeForm(forms.ModelForm):
-    student = forms.IntegerField(widget=forms.HiddenInput())
 
+class StudentGradeForm(forms.ModelForm):
     class Meta:
         model = StudentGrade
-        fields = ['student', 'subject', 'first_grading', 'second_grading', 'third_grading', 'fourth_grading']
+        fields = ['subject', 'first_grading', 'second_grading', 'third_grading', 'fourth_grading']
+
+    def __init__(self, *args, **kwargs):
+        student_info = kwargs.pop('student_info', None)
+        super().__init__(*args, **kwargs)
+        if student_info:
+            self.fields['student_info'].initial = student_info.id
 
     def clean(self):
         cleaned_data = super().clean()
-        student = cleaned_data.get('student')
+        student_info = cleaned_data.get('student_info')
         subject = cleaned_data.get('subject')
 
-        if StudentGrade.objects.filter(student_id=student, subject=subject).exists():
+        if StudentGrade.objects.filter(student=student_info, subject=subject).exists():
             raise forms.ValidationError(f'A grade for {subject.name} already exists for this student.')
 
         return cleaned_data

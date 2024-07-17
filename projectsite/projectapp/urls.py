@@ -38,9 +38,9 @@ urlpatterns = [
     path('parent/update/<int:pk>/', views.update_parent, name='parent-update'),
     path('parentguardian/delete/', views.delete_parent, name='parent-delete'),
     path('teacher/delete/', views.delete_teacher, name='teacher-delete'),
-    path('users/', views.user_list, name='user-list'),
-    path('users/add', views.add_user, name='user-add'),
-    path('users/<int:pk>/update/', views.update_user, name='user-update'),
+    path('user/', views.user_list, name='user-list'),
+    path('user/add/', views.user_add, name='user-add'),
+    path('user/update/<int:pk>/', views.user_update, name='user-update'),
     path('invalid/', views.custom_page, name='custom_page'),
     path('student-academic/<int:student_id>/', views.student_academic_record, name='student_academic_record'),
 
