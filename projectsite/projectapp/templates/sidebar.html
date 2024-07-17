@@ -1,6 +1,7 @@
+
 <div class="sidebar" data-color="white" data-active-color="danger">
     <div class="logo text-center">
-      <a href="https://www.creative-tim.com" class="simple-text logo-normal">
+      <a href="#" class="simple-text logo-normal">
         <div class="logo-image-big">
           <img src="/static/images/logo.png">
         </div>
@@ -95,6 +96,7 @@
                         </i>
                     </i> Grade Level List</a>
                 </li>
+                {% if request.user.is_superuser %}
                 <li>
                     <a href="{% url 'user-list'%}">
                     <i>
@@ -103,6 +105,7 @@
                         </svg>
                     </i>User</a>
                 </li>
+                {% endif %}
             </ul>
         </li>
       </ul>

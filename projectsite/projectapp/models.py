@@ -128,10 +128,10 @@ class Subject(models.Model):
 class StudentGrade(models.Model):
     student = models.ForeignKey(StudentInfo, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    first_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    second_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    third_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    fourth_grading = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    first_grading = models.IntegerField( null=True, blank=True)
+    second_grading = models.IntegerField(null=True, blank=True)
+    third_grading = models.IntegerField(null=True, blank=True)
+    fourth_grading = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.student.student} - {self.subject}"

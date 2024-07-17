@@ -126,7 +126,16 @@ class TeacherForm(forms.ModelForm):
 class StudentInfoForm(forms.ModelForm):
     class Meta:
         model = StudentInfo
-        fields = '__all__'   
+        fields = [
+            'student', 'grade_level', 'school_year', 'section', 
+            'paid_first_quarter', 'paid_second_quarter', 'paid_third_quarter', 'paid_fourth_quarter'
+        ]
+        widgets = {
+            'paid_first_quarter': forms.Select(choices=[(0, 'Not Paid'), (1, 'Paid')]),
+            'paid_second_quarter': forms.Select(choices=[(0, 'Not Paid'), (1, 'Paid')]),
+            'paid_third_quarter': forms.Select(choices=[(0, 'Not Paid'), (1, 'Paid')]),
+            'paid_fourth_quarter': forms.Select(choices=[(0, 'Not Paid'), (1, 'Paid')]),
+        }
 
 class LogoutForm(forms.Form):
     pass

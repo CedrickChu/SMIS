@@ -46,6 +46,7 @@ urlpatterns = [
     path('fetch_student_grade/<int:grade_id>/', views.fetch_student_grade, name='fetch_student_grade'),
     path('update_student_grade/<int:grade_id>/', views.update_student_grade, name='update_student_grade'),
     path('delete_student_grade/<int:grade_id>/', views.delete_student_grade, name='delete_student_grade'),
+
 ]
     
 

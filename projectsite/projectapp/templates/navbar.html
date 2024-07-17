@@ -1,42 +1,15 @@
-<nav class="navbar navbar-expand-lg navbar-absolute fixed-top navbar-transparent">
-    <div class="container-fluid">
-      <div class="navbar-wrapper">
-        <div class="navbar-toggle">
-          <button type="button" class="navbar-toggler">
-            <span class="navbar-toggler-bar bar1"></span>
-            <span class="navbar-toggler-bar bar2"></span>
-            <span class="navbar-toggler-bar bar3"></span>
-          </button>
-        </div>
-        <a class="navbar-brand" href="javascript:;">Management Information System</a>
-      </div>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-bar navbar-kebab"></span>
-        <span class="navbar-toggler-bar navbar-kebab"></span>
-        <span class="navbar-toggler-bar navbar-kebab"></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-end" id="navigation">
-        <form>
-          <div class="input-group no-border">
-            <input type="text" value="" class="form-control" placeholder="Search...">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <i class="nc-icon nc-zoom-split"></i>
-              </div>
-            </div>
-          </div>
-        </form>
+<nav class="navbar navbar-expand-lg navbar-absolute fixed-top ">
+    <div class="collapse navbar-collapse justify-content-end" id="navigation">    
         <ul>
-          <li class="nav-item dropdown">
+            <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle btn-rotate" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-cog"></i>
+                <i class="fa fa-cog"></i>
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="#"><i class="fa fa-pen"></i> Profile</a>
-              <a class="dropdown-item" href="{% url 'logout'%}"><i class="fa fa-fw fa-power-off"></i>Logout</a>
+                <a class="dropdown-item" href="#"><i class="fa fa-pen"></i> Profile</a>
+                <a class="dropdown-item" href="{% url 'logout'%}"><i class="fa fa-fw fa-power-off"></i>Logout</a>
             </div>
-          </li>
+            </li>
         </ul>
-      </div>
     </div>
-  </nav>
+</nav>

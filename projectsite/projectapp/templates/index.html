@@ -1,213 +1,110 @@
+{% extends 'base.html' %}
 
-  {% extends 'base.html' %}
-  {% block content %}
-  <div class="wrapper ">
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="wrapper">
     {% include 'sidebar.html' %}
     <div class="main-panel">
-      <!-- Navbar -->
-      {% include 'navbar.html' %}
-      <!-- End Navbar -->
-      <div class="content">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success" role="alert">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        <div class="row">
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-globe text-warning"></i>
+        <!-- Navbar -->
+         <header>
+            {% include 'navbar.html' %}
+         </header>
+        
+        <!-- End Navbar -->
+        <div class="content">
+            <div class='container'>
+                <h1>STUDENT DASHBOARD</h1>
+                <h2>Student Enrolled for {{ current_school_year.year }}</h2><br><br>    
+                <form id="filter-form" method="GET" action="{% url 'home' %}">
+                    <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
+                        <select name="school_year" class="form-control" style="height:40px;">
+                            <option value="">Default (CURRENT YEAR)</option>
+                            {% for year in school_years %}
+                            <option value="{{ year.id }}" {% if request.GET.school_year == year.id|stringformat:'s' %} selected {% endif %}>{{ year.year }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Capacity</p>
-                      <p class="card-title">150GB<p>
+                    <div style="float: right; margin-right: 10px; margin-top: -10px;">
+                        <button style="height: 40px;" type="button" class="btn btn-primary" onclick="filterStudents()">Filter</button>
                     </div>
-                  </div>
+                </form>
+                <div class="container" style="width: 700px !important;height:800px;">
+                    <h3 class='text-center'>Pie Chart</h3>
+                    <canvas id="genderPieChart" width="100" height="50"></canvas>
                 </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-refresh"></i>
-                  Update Now
+                <div class="container" style="width: 800px !important;height:1000px;">
+                        <h3 class='text-center'>Bar Chart</h3>
+                        <canvas id="gradeBarChart" width="50" height="50"></canvas>
                 </div>
-              </div>
+                
             </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-money-coins text-success"></i>
-                    </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Revenue</p>
-                      <p class="card-title">$ 1,345<p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-calendar-o"></i>
-                  Last day
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-vector text-danger"></i>
-                    </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Errors</p>
-                      <p class="card-title">23<p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-clock-o"></i>
-                  In the last hour
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card card-stats">
-              <div class="card-body ">
-                <div class="row">
-                  <div class="col-5 col-md-4">
-                    <div class="icon-big text-center icon-warning">
-                      <i class="nc-icon nc-favourite-28 text-primary"></i>
-                    </div>
-                  </div>
-                  <div class="col-7 col-md-8">
-                    <div class="numbers">
-                      <p class="card-category">Followers</p>
-                      <p class="card-title">+45K<p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-refresh"></i>
-                  Update now
-                </div>
-              </div>
-            </div>
-          </div>
+            <table id='data-table'></table>        
         </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="card ">
-              <div class="card-header ">
-                <h5 class="card-title">Users Behavior</h5>
-                <p class="card-category">24 Hours performance</p>
-              </div>
-              <div class="card-body ">
-                <canvas id=chartHours width="400" height="100"></canvas>
-              </div>
-              <div class="card-footer ">
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-history"></i> Updated 3 minutes ago
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="card ">
-              <div class="card-header ">
-                <h5 class="card-title">Email Statistics</h5>
-                <p class="card-category">Last Campaign Performance</p>
-              </div>
-              <div class="card-body ">
-                <canvas id="chartEmail"></canvas>
-              </div>
-              <div class="card-footer ">
-                <div class="legend">
-                  <i class="fa fa-circle text-primary"></i> Opened
-                  <i class="fa fa-circle text-warning"></i> Read
-                  <i class="fa fa-circle text-danger"></i> Deleted
-                  <i class="fa fa-circle text-gray"></i> Unopened
-                </div>
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-calendar"></i> Number of emails sent
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-8">
-            <div class="card card-chart">
-              <div class="card-header">
-                <h5 class="card-title">NASDAQ: AAPL</h5>
-                <p class="card-category">Line Chart with Points</p>
-              </div>
-              <div class="card-body">
-                <canvas id="speedChart" width="400" height="100"></canvas>
-              </div>
-              <div class="card-footer">
-                <div class="chart-legend">
-                  <i class="fa fa-circle text-info"></i> Tesla Model S
-                  <i class="fa fa-circle text-warning"></i> BMW 5 Series
-                </div>
-                <hr />
-                <div class="card-stats">
-                  <i class="fa fa-check"></i> Data information certified
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <footer class="footer footer-black  footer-white ">
-        <div class="container-fluid">
-          <div class="row">
-            <nav class="footer-nav">
-              <ul>
-                <li><a href="https://www.creative-tim.com" target="_blank">Creative Tim</a></li>
-                <li><a href="https://www.creative-tim.com/blog" target="_blank">Blog</a></li>
-                <li><a href="https://www.creative-tim.com/license" target="_blank">Licenses</a></li>
-              </ul>
-            </nav>
-            <div class="credits ml-auto">
-              <span class="copyright">
-                © <script>
-                  document.write(new Date().getFullYear())
-                </script>, made with <i class="fa fa-heart heart"></i> by Creative Tim
-              </span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
-  </div>
+</div>
+
+<script>
+    function filterStudents() {
+        document.getElementById("filter-form").submit();
+    }
+                                
+    const pieChartData = JSON.parse('{{ pie_chart_data_json | safe }}');
+    const pieCtx = document.getElementById('genderPieChart').getContext('2d');
+
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: pieChartData.labels,
+            datasets: [{
+                data: pieChartData.data,
+                backgroundColor: pieChartData.backgroundColor
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Gender Distribution'
+                }
+            }
+        }
+    });
+
+    const barChartData  = JSON.parse('{{ bar_chart_data_json | safe }}');
+    const barCtx = document.getElementById('gradeBarChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: barChartData.labels,
+            datasets: [{
+                label: 'Number of Students',
+                data: barChartData.data,
+                backgroundColor: barChartData.backgroundColor.slice(0, barChartData.labels.length),
+                borderWidth: 4
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Grade Level Distribution'
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

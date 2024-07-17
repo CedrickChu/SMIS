@@ -27,6 +27,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from django.core.paginator import Paginator
+import json
 
 
 # def email_verification_required(request):
@@ -48,6 +49,69 @@ def custom_page(request):
     return render(request, 'custom_page.html')
 
 
+
+def home(request):
+    # Get the current school year with status=True
+    current_school_year = SchoolYear.objects.filter(status=True).first()
+    school_years = SchoolYear.objects.all()
+
+    # Check if 'school_year' is in GET parameters
+    if 'school_year' in request.GET:
+        school_year_id = request.GET.get('school_year')
+        school_level_filter = SchoolYear.objects.filter(id=school_year_id).first()
+    else:
+        school_level_filter = current_school_year
+
+    if school_level_filter:
+        # Gender pie chart data
+        male_students_count = StudentInfo.objects.filter(school_year=school_level_filter, student__gender='M').count()
+        female_students_count = StudentInfo.objects.filter(school_year=school_level_filter, student__gender='F').count()
+
+        pie_chart_data = {
+            'labels': ['Male', 'Female'],
+            'data': [male_students_count, female_students_count],
+            'backgroundColor': [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)'
+            ]
+        }
+        pie_chart_data_json = json.dumps(pie_chart_data)
+
+        # Grade level bar chart data
+        grade_levels = GradeLevel.objects.all()
+        grade_labels = [grade.name for grade in grade_levels]
+        student_counts = []
+
+        for grade in grade_levels:
+            count = StudentInfo.objects.filter(school_year=school_level_filter, grade_level=grade).count()
+            student_counts.append(count)
+
+        bar_chart_data = {
+            'labels': grade_labels,
+            'data': student_counts,
+            'backgroundColor': [
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)'
+            ] * (len(grade_levels) // 6 + 1)  # Repeat colors if needed
+        }
+        bar_chart_data_json = json.dumps(bar_chart_data)
+
+        context = {
+            'pie_chart_data_json': pie_chart_data_json,
+            'bar_chart_data_json': bar_chart_data_json,
+            'current_school_year': school_level_filter,
+            'school_years': school_years
+        }
+
+        return render(request, 'index.html', context)
+    else:
+        return render(request, 'report/no_school_year.html')
+
+
 def login_view(request):
     if request.user.is_authenticated:
          return redirect('home')
@@ -66,9 +130,7 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
-@login_required
-def home(request):
-    return render(request, 'index.html')
+
 
 
 def logout_view(request):

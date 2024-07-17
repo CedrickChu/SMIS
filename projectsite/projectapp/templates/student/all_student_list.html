@@ -44,33 +44,66 @@
                             <div class="table">
                                 <table class="table table-hover table-bordered" id='allStudentTable'>
                                     <thead class="text-primary text-center">
-                                        <th>LRN No.</th>
-                                        <th>Name</th>
-                                        <th>Grade Level</th>
-                                        <th>School Year</th>
+                                        <tr>
+                                            <th rowspan="2">LRN No.</th>
+                                            <th rowspan="2">Name</th>
+                                            <th rowspan="2">Grade Level</th>
+                                            <th rowspan="2">Section</th>
+                                            <th rowspan="2">School Year</th>
+                                            <th colspan="4">Payment</th>
+                                        </tr>
+                                        <tr>
+                                            <th>First Quarter</th>
+                                            <th>Second Quarter</th>
+                                            <th>Third Quarter</th>
+                                            <th>Fourth Quarter</th>
+                                        </tr>
+                                        
+
                                     </thead>
                                     <tbody>
                                         {% for student_info in student_infos %}
                                         <tr>
                                             <td>
-                                                <div style="width: 40%; margin: auto;">
+                                                <div>
                                                     {{ student_info.student.lrn }}
                                                 </div>
                                             </td>
                                             <td>
-                                                <div style="width: 50%; margin: auto;">
+                                                <div >
                                                     {{ student_info.student.first_name }} {{ student_info.student.middle_name }} {{ student_info.student.last_name }}
                                                 </div>
                                             </td>
                                             <td>
-                                                <div style="width: 30%; margin: auto;">
+                                                <div >
                                                     {{ student_info.grade_level }}
                                                 </div>
                                             </td>
                                             <td>
-                                                <div style="width: 30%; margin: auto;">
+                                                <div >
+                                                    {{ student_info.section }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div >
                                                     {{ student_info.school_year.year }}
                                                 </div>
+                                            </td>
+                                            <td>
+                                                {% if student_info.paid_first_quarter %} Paid {% else %} Not Paid
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if student_info.paid_second_quarter %} Paid {% else %} Not Paid
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if student_info.paid_third_quarter %} Paid {% else %} Not Paid
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if student_info.paid_fourth_quarter %} Paid {% else %} Not Paid
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% endfor %}
