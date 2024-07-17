@@ -108,7 +108,13 @@ class SubjectForm(forms.ModelForm):
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section
-        fields = '__all__'   
+        fields = ['name', 'grade_level', 'adviser']
+
+    def __init__(self, *args, **kwargs):
+        initial_grade_level = kwargs.pop('initial_grade_level', None)
+        super().__init__(*args, **kwargs)
+        if initial_grade_level:
+            self.fields['grade_level'].initial = initial_grade_level
 
 class TeacherForm(forms.ModelForm):
     class Meta:

@@ -438,17 +438,20 @@ class StudentDeleteView(DeleteView):
 @login_required
 def subject_list(request):
     search_query = request.GET.get('search', '')
-
     subjects = Subject.objects.all()
     if search_query:
         subjects = subjects.filter(name__icontains=search_query)
+    subject_form = SubjectForm()
 
+    submit_label = 'Add  Subject'  
+    form_title = 'Add Subject'
     return render(request, 'maintenance/subject_list.html', {
         'subjects': subjects,
-        'subject_form': SubjectForm(),
-        'form_title': 'Add Subject',
-        'submit_label': 'Add Subject',
+        'subject_form': subject_form,
+        'submit_label': submit_label,
+        'form_title': form_title,
     })
+
 
 @user_passes_test(is_superuser)
 @login_required
@@ -479,11 +482,11 @@ def update_subject(request, pk):
             return redirect('subject-list')
     else:
         form = SubjectForm(instance=subject)
-    submit_label = 'Update subject' 
+    submit_label = 'Update Subject' 
     return render(request, 'maintenance/subject_list.html', {
         'subject_form': form,
         'submit_label': submit_label,
-        'form_title': 'Edit subject'  
+        'form_title': 'Update Subject'  
     })
 
 # class SchoolYearListView(ListView):
@@ -620,7 +623,7 @@ def section_list(request):
     grade_levels = GradeLevel.objects.all()
     advisers = Teacher.objects.all()
     grade_level_filter = request.GET.get('grade_level')
-    default_grade_level_id = 1  
+    default_grade_level_id = 1 
     
     if grade_level_filter:
         sections = sections.filter(grade_level_id=grade_level_filter)
@@ -645,16 +648,25 @@ def add_section(request):
     if request.method == 'POST':
         section_form = SectionForm(request.POST)
         if section_form.is_valid():
-            section_form.save()
-            return redirect('section-list')
+            # Check if adviser is already assigned to a section
+            adviser_id = section_form.cleaned_data['adviser'].id
+            if Section.objects.filter(adviser_id=adviser_id).exists():
+                messages.error(request, 'This teacher is already assigned to a section.')
+            else:
+                section_form.save()
+                return redirect('section-list')
     else:
-        section_form = SectionForm()
-    submit_label = 'Add Section'  
+        initial_grade_level = request.GET.get('grade_level')
+        section_form = SectionForm(initial={'grade_level': initial_grade_level})
+        # If no filter is applied, set default grade level
+        if not initial_grade_level:
+            section_form.fields['grade_level'].initial = 1  # Set your default grade level ID here
 
+    submit_label = 'Add Section'
     return render(request, 'maintenance/section_list.html', {
         'section_form': section_form,
         'submit_label': submit_label,
-        'form_title': 'Add Section'  
+        'form_title': 'Add Section',
     })
 
 @user_passes_test(is_superuser)

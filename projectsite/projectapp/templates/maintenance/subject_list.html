@@ -37,7 +37,7 @@
                                         <td><input id="subject{{ subject.id }}" type="text" style="border:0px" value="{{ subject.name }}" readonly></td>
                                         {% if request.user.is_superuser%}
                                         <td class="text-center">
-                                            <a href="#" onclick="editSubject('{{ subject.id }}', '{{ subject.grade_level.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
+                                            <a href="#" onclick="editSubject('{{ subject.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
                                         </td>
                                         {% endif %}
                                     </tr>
@@ -78,7 +78,7 @@
                                     <div id="status"></div>
                                     <div class="form-group">
                                         <input type="button" class="btn btn-info" id="reset" name="reset" value="Cancel" onclick="resetForm()">
-                                        <button type="submit" class="btn btn-info" id="btn_submit">{{ submit_label }}</button>
+                                            <button type="button" class="btn btn-info" id="btn_submit" data-toggle="modal" data-target="#confirmationModal">{{ submit_label }}</button>
                                     </div>
                                 </form>
                             </div>
@@ -91,9 +91,30 @@
     </div>
 </div>
 
+ <!-- Confirmation Modal -->
+ <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Submission</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        Are you sure you want to submit this form?
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmSubmitButton">Confirm</button>
+        </div>
+    </div>
+    </div>
+</div>
+
 <script>
     
-    function editSubject(subjectId, gradeLevelId) {
+    function editSubject(subjectId) {
         var subjectName = document.getElementById('subject' + subjectId).value;
         document.getElementById('subject-form').action = "{% url 'subject-update' pk=0 %}".replace('0', subjectId);
         document.getElementById('id').value = subjectId;
@@ -112,6 +133,11 @@
         document.getElementById('head').innerText = '{{ form_title }}';
         document.getElementById('btn_submit').innerText = '{{ submit_label }}';
     }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('confirmSubmitButton').addEventListener('click', function() {
+            document.getElementById('subject-form').submit();
+        });
+    });
 
 </script>
 {% endblock %}
