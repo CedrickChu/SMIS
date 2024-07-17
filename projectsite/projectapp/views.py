@@ -770,7 +770,7 @@ def student_academic_record(request, student_id):
     student_grades = StudentGrade.objects.filter(student=default_student_info) if default_student_info else None
     grade_levels = set(info.grade_level for info in student_infos)
 
-    grade_level_id = None  # Initialize grade_level_id
+    grade_level_id = None 
 
     # Handle filtering by grade level if form is submitted
     if 'grade_level' in request.GET:
@@ -781,15 +781,23 @@ def student_academic_record(request, student_id):
                 student_grades = StudentGrade.objects.filter(student=student_info)
                 default_student_info = student_info 
 
+    # Get subjects that already have grades for this student and grade level
+    if default_student_info:
+        graded_subject_ids = StudentGrade.objects.filter(student=default_student_info).values_list('subject_id', flat=True)
+        subjects = subjects.exclude(id__in=graded_subject_ids)
+
     # Handle form submission to add StudentGrade
     if request.method == 'POST':
         form = StudentGradeForm(request.POST)
         if form.is_valid():
+            grade_level_id = request.POST.get('grade_level')
+            if grade_level_id:
+                default_student_info = StudentInfo.objects.filter(student=student, grade_level=grade_level_id).first()
+
             student_grade = form.save(commit=False)
             student_grade.student = default_student_info 
             student_grade.save()
             
-            # Redirect to the same page with the grade_level parameter
             url = reverse('student_academic_record', args=[student_id])
             if grade_level_id:
                 url += f'?grade_level={grade_level_id}#{grade_level_id}'
@@ -805,6 +813,7 @@ def student_academic_record(request, student_id):
         'grade_levels': grade_levels,
         'subjects': subjects,
         'form': form,
+        'grade_level_id': grade_level_id,
     }
 
     return render(request, 'student/student_academic_record.html', context)
