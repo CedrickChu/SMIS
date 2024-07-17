@@ -96,3 +96,6 @@ svg, i{
     border-color: #17a2b8;
     
 }
+.dataTables_wrapper .dataTables_filter input{
+    background-color: white!important;
+}
