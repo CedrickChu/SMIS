@@ -120,6 +120,7 @@ class StudentInfo(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
+    grade_level = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name

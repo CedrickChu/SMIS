@@ -437,21 +437,27 @@ class StudentDeleteView(DeleteView):
 
 @login_required
 def subject_list(request):
-    search_query = request.GET.get('search', '')
-    subjects = Subject.objects.all()
-    if search_query:
-        subjects = subjects.filter(name__icontains=search_query)
-    subject_form = SubjectForm()
+    grade_levels = GradeLevel.objects.all()
+    selected_grade_level_id = request.GET.get('grade_level')
 
-    submit_label = 'Add  Subject'  
-    form_title = 'Add Subject'
-    return render(request, 'maintenance/subject_list.html', {
+    # If no grade level is selected, use the first grade level as the default
+    if not selected_grade_level_id and grade_levels.exists():
+        selected_grade_level_id = grade_levels.first().id
+
+    # Filter subjects by the selected grade level
+    if selected_grade_level_id:
+        subjects = Subject.objects.filter(grade_level_id=selected_grade_level_id)
+    else:
+        subjects = Subject.objects.all()
+
+    context = {
         'subjects': subjects,
-        'subject_form': subject_form,
-        'submit_label': submit_label,
-        'form_title': form_title,
-    })
-
+        'grade_levels': grade_levels,
+        'selected_grade_level_id': selected_grade_level_id,
+        'form_title': 'Add Subject',
+        'submit_label': 'Add Subject'
+    }
+    return render(request, 'maintenance/subject_list.html', context)
 
 @user_passes_test(is_superuser)
 @login_required
@@ -460,7 +466,9 @@ def add_subject(request):
         form = SubjectForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('subject-list')
+            search = request.POST.get('search', '')
+            grade_level = request.POST.get('grade_level', '')
+            return redirect(f'/subject/?search={search}&grade_level={grade_level}')
     else:
         form = SubjectForm()
     submit_label = 'Add Subject'  
@@ -479,14 +487,16 @@ def update_subject(request, pk):
         form = SubjectForm(request.POST, instance=subject)
         if form.is_valid():
             form.save()
-            return redirect('subject-list')
+            search = request.POST.get('search', '')
+            grade_level = request.POST.get('grade_level', '')
+            return redirect(f'/subject/?search={search}&grade_level={grade_level}')
     else:
         form = SubjectForm(instance=subject)
-    submit_label = 'Update Subject' 
+    submit_label = 'Update subject' 
     return render(request, 'maintenance/subject_list.html', {
         'subject_form': form,
         'submit_label': submit_label,
-        'form_title': 'Update Subject'  
+        'form_title': 'Edit subject'  
     })
 
 # class SchoolYearListView(ListView):
@@ -859,6 +869,8 @@ def student_academic_record(request, student_id):
     if default_student_info:
         graded_subject_ids = StudentGrade.objects.filter(student=default_student_info).values_list('subject_id', flat=True)
         subjects = subjects.exclude(id__in=graded_subject_ids)
+        # Filter subjects by the student's grade level
+        subjects = subjects.filter(grade_level=default_student_info.grade_level)
 
     # Handle form submission to add StudentGrade
     if request.method == 'POST':

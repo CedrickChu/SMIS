@@ -19,6 +19,16 @@
                                         <button type="submit" class="input-group-text"><i class="nc-icon nc-zoom-split"></i></button>
                                     </div>
                                 </div>
+                                <div class="input-group no-border" style="float:right; width:20%; margin-right: 10px;">
+                                    <select name="grade_level" class="form-control" style="height:40px;">
+                                        {% for level in grade_levels %}
+                                        <option value="{{ level.id }}" {% if selected_grade_level_id == level.id|stringformat:'s' %} selected {% endif %}>{{ level.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div style="float: right; margin-right: 10px; margin-top:-10px;">
+                                    <button style='height:40px;' type="button" class="btn btn-primary" onclick="filterSubjects()">Filter</button>
+                                </div>
                             </form>
                         </div>
                         <div class="panel-body">
@@ -26,7 +36,8 @@
                                 <thead>
                                     <tr class="text-center">
                                         <th style="width:20%">Subject</th>
-                                        {% if request.user.is_superuser%}
+                                        <th style="width:10%">Grade Level</th>
+                                        {% if request.user.is_superuser %}
                                         <th style="width:10%">Action</th>
                                         {% endif %}
                                     </tr>
@@ -35,9 +46,10 @@
                                     {% for subject in subjects %}
                                     <tr class="text-center">
                                         <td><input id="subject{{ subject.id }}" type="text" style="border:0px" value="{{ subject.name }}" readonly></td>
-                                        {% if request.user.is_superuser%}
+                                        <td><input id="grade-level{{ subject.id }}" type="text" style="border:0px" value="{{ subject.grade_level.name }}" readonly></td>
+                                        {% if request.user.is_superuser %}
                                         <td class="text-center">
-                                            <a href="#" onclick="editSubject('{{ subject.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
+                                            <a href="#" onclick="editSubject('{{ subject.id }}', '{{ subject.grade_level.id }}')" class="btn btn-info"><i class="fa fa-pen" aria-hidden="true"></i> Edit</a>
                                         </td>
                                         {% endif %}
                                     </tr>
@@ -51,11 +63,13 @@
                 <div class="col-md-4">
                     <div class="container frm-new">
                         <div class="row main">
-                            <div class="main-login main-center"  style="width:90%; margin:auto; padding:30px;">
+                            <div class="main-login main-center" style="padding:20px;">
                                 <h3 id="head">{{ form_title }}</h3>
                                 <form id="subject-form" method="post" action="{% url 'subject-add' %}">
                                     {% csrf_token %}
                                     <input type="hidden" id="id" name="id">
+                                    <input type="hidden" id="filter_search" name="search" value="{{ request.GET.search }}">
+                                    <input type="hidden" id="filter_grade_level" name="grade_level" value="{{ request.GET.grade_level }}">
                                     <div class="form-group">
                                         <label for="name" class="cols-sm-2 control-label">Subject Name</label>
                                         <div class="cols-sm-4">
@@ -75,10 +89,18 @@
                                             </p>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="grade_level">Grade Level</label>
+                                        <select id="grade_level" name="grade_level" class="form-control" style="height:40px;">
+                                            {% for level in grade_levels %}
+                                            <option value="{{ level.id }}" {% if selected_grade_level_id == level.id|stringformat:'s' %} selected {% endif %}>{{ level.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
                                     <div id="status"></div>
                                     <div class="form-group">
                                         <input type="button" class="btn btn-info" id="reset" name="reset" value="Cancel" onclick="resetForm()">
-                                            <button type="button" class="btn btn-info" id="btn_submit" data-toggle="modal" data-target="#confirmationModal">{{ submit_label }}</button>
+                                        <button type="submit" class="btn btn-info" id="btn_submit" onclick="updateFormAction()">{{ submit_label }}</button>
                                     </div>
                                 </form>
                             </div>
@@ -91,53 +113,35 @@
     </div>
 </div>
 
- <!-- Confirmation Modal -->
- <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="confirmationModalLabel">Confirm Submission</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        </div>
-        <div class="modal-body">
-        Are you sure you want to submit this form?
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="confirmSubmitButton">Confirm</button>
-        </div>
-    </div>
-    </div>
-</div>
-
 <script>
-    
-    function editSubject(subjectId) {
+    function filterSubjects() {
+        document.getElementById("filter-form").submit();
+    }
+
+    function editSubject(subjectId, gradeLevelId) {
         var subjectName = document.getElementById('subject' + subjectId).value;
         document.getElementById('subject-form').action = "{% url 'subject-update' pk=0 %}".replace('0', subjectId);
         document.getElementById('id').value = subjectId;
         document.getElementById('name').value = subjectName;
-        document.getElementById('grade_level').value = gradeLevelId; 
+        document.getElementById('grade_level').value = gradeLevelId;
         document.getElementById('head').innerText = 'Edit Subject';
         document.getElementById('btn_submit').innerText = 'Update Subject';
-
     }
 
     function resetForm() {
         document.getElementById('subject-form').action = "{% url 'subject-add' %}";
         document.getElementById('id').value = '';
         document.getElementById('name').value = '';
-        document.getElementById('grade_level').value = '';
+        document.getElementById('grade_level').selectedIndex = 0; // Select the first option
         document.getElementById('head').innerText = '{{ form_title }}';
         document.getElementById('btn_submit').innerText = '{{ submit_label }}';
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('confirmSubmitButton').addEventListener('click', function() {
-            document.getElementById('subject-form').submit();
-        });
-    });
 
+    function updateFormAction() {
+        var form = document.getElementById('subject-form');
+        var searchParam = document.getElementById('filter_search').value;
+        var gradeLevelParam = document.getElementById('filter_grade_level').value;
+        form.action += '?search=' + encodeURIComponent(searchParam) + '&grade_level=' + encodeURIComponent(gradeLevelParam);
+    }
 </script>
 {% endblock %}
